@@ -303,7 +303,7 @@ class _AssetPageState extends State<AssetPage>
                           ? Padding(
                               padding: EdgeInsets.only(bottom: 16),
                               child: Text(
-                                '≈ \$ ${tokenPrice ?? '--.--'}',
+                                '≈ Rp. ${tokenPrice ?? '--.--'}',
                                 style: TextStyle(
                                   color: Theme.of(context).cardColor,
                                 ),

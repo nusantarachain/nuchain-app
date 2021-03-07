@@ -176,8 +176,15 @@ class _AssetsState extends State<AssetsPage> {
         children: <Widget>[
           ListTile(
             leading: AddressIcon(acc.address, svg: acc.icon),
-            title: Text(UI.accountName(context, acc), style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: connecting ? Text(network, style: TextStyle(fontStyle: FontStyle.italic, color: Colors.blue[800]),) : Text(network),
+            title: Text(UI.accountName(context, acc),
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: connecting
+                ? Text(
+                    network,
+                    style: TextStyle(
+                        fontStyle: FontStyle.italic, color: Colors.blue[800]),
+                  )
+                : Text(network),
           ),
           ListTile(
             title: Row(
@@ -196,10 +203,12 @@ class _AssetsState extends State<AssetsPage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 8),
-                  child: connecting ? Text("-") : Text(
-                    '$accIndex${Fmt.address(acc.address)}',
-                    style: TextStyle(fontSize: 14),
-                  ),
+                  child: connecting
+                      ? Text("-")
+                      : Text(
+                          '$accIndex${Fmt.address(acc.address)}',
+                          style: TextStyle(fontSize: 14),
+                        ),
                 )
               ],
             ),
@@ -222,12 +231,20 @@ class _AssetsState extends State<AssetsPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    widget.service.assets.fetchMarketPrice();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
         bool connecting = widget.connectedNode == null;
-        final symbol = SafeGetter.getStr(widget.service.plugin.networkState.tokenSymbol);
-        final decimals = SafeGetter.getInt(widget.service.plugin.networkState.tokenDecimals, 12);
+        final symbol =
+            SafeGetter.getStr(widget.service.plugin.networkState.tokenSymbol);
+        final decimals = SafeGetter.getInt(
+            widget.service.plugin.networkState.tokenDecimals, 12);
 
         final balancesInfo = widget.service.plugin.balances.native;
         final tokens = widget.service.plugin.balances.tokens;
@@ -355,20 +372,22 @@ class _AssetsState extends State<AssetsPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            connecting ? Text("-") : Text(
-                              Fmt.priceFloorBigInt(
-                                  balancesInfo != null
-                                      ? Fmt.balanceTotal(balancesInfo)
-                                      : BigInt.zero,
-                                  decimals,
-                                  lengthFixed: 4),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: Colors.black54),
-                            ),
+                            connecting
+                                ? Text("-")
+                                : Text(
+                                    Fmt.priceFloorBigInt(
+                                        balancesInfo != null
+                                            ? Fmt.balanceTotal(balancesInfo)
+                                            : BigInt.zero,
+                                        decimals,
+                                        lengthFixed: 4),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                        color: Colors.black54),
+                                  ),
                             Text(
-                              '≈ \$ ${tokenPrice ?? '--.--'}',
+                              '≈ Rp. ${tokenPrice ?? '--.--'}',
                               style: TextStyle(
                                 color: Theme.of(context).disabledColor,
                               ),

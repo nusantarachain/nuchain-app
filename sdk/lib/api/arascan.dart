@@ -235,7 +235,7 @@ class AraScanApi {
     String url = '${getSnEndpoint(para.network)}/token';
     Map<String, String> headers = {"Content-type": "application/json"};
 
-    Response res = await post(url, headers: headers);
+    Response res = await get(url, headers: headers);
     if (res.body != null) {
       try {
         final obj = await compute(jsonDecode, res.body);

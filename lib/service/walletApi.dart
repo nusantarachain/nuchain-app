@@ -10,45 +10,49 @@ class WalletApi {
   static const String _jsCodeStorageVersionKey = 'js_service_version_';
 
   static Future<Map> getLatestVersion() async {
-    try {
-      Response res = await get('$_endpoint/versions.json');
-      if (res == null) {
-        return null;
-      } else {
-        return jsonDecode(utf8.decode(res.bodyBytes)) as Map;
-      }
-    } catch (err) {
-      print(err);
-      return null;
-    }
+    // temporary disabled;
+    return null;
+    // try {
+    //   Response res = await get('$_endpoint/versions.json');
+    //   if (res == null) {
+    //     return null;
+    //   } else {
+    //     return jsonDecode(utf8.decode(res.bodyBytes)) as Map;
+    //   }
+    // } catch (err) {
+    //   print(err);
+    //   return null;
+    // }
   }
 
   static Future<Map> fetchPolkadotJSVersion() async {
-    try {
-      Response res = await get('$_endpoint/jsCodeVersions.json');
-      if (res == null) {
-        return null;
-      } else {
-        return Map.of(jsonDecode(res.body));
-      }
-    } catch (err) {
-      print(err);
-      return null;
-    }
+    return null;
+    // try {
+    //   Response res = await get('$_endpoint/jsCodeVersions.json');
+    //   if (res == null) {
+    //     return null;
+    //   } else {
+    //     return Map.of(jsonDecode(res.body));
+    //   }
+    // } catch (err) {
+    //   print(err);
+    //   return null;
+    // }
   }
 
   static Future<String> fetchPolkadotJSCode(String networkName) async {
-    try {
-      Response res = await get('$_endpoint/js_service/$networkName.js');
-      if (res == null || res.statusCode != 200) {
-        return null;
-      } else {
-        return utf8.decode(res.bodyBytes);
-      }
-    } catch (err) {
-      print(err);
-      return null;
-    }
+    return null;
+    // try {
+    //   Response res = await get('$_endpoint/js_service/$networkName.js');
+    //   if (res == null || res.statusCode != 200) {
+    //     return null;
+    //   } else {
+    //     return utf8.decode(res.bodyBytes);
+    //   }
+    // } catch (err) {
+    //   print(err);
+    //   return null;
+    // }
   }
 
   static int getPolkadotJSVersion(
@@ -86,16 +90,17 @@ class WalletApi {
   }
 
   static Future<List> getAnnouncements() async {
-    try {
-      Response res = await get('$_endpoint/announce.json');
-      if (res == null) {
-        return null;
-      } else {
-        return jsonDecode(utf8.decode(res.bodyBytes));
-      }
-    } catch (err) {
-      print(err);
-      return null;
-    }
+    return null;
+    // try {
+    //   Response res = await get('$_endpoint/announce.json');
+    //   if (res == null) {
+    //     return null;
+    //   } else {
+    //     return jsonDecode(utf8.decode(res.bodyBytes));
+    //   }
+    // } catch (err) {
+    //   print(err);
+    //   return null;
+    // }
   }
 }
