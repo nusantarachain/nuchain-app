@@ -4,7 +4,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart';
 
 class WalletApi {
-  static const String _endpoint = 'https://api.polkawallet.io';
+  static const String _endpoint = 'https://app.nuchain.riset.tech';
 
   static const String _jsCodeStorageKey = 'js_service_';
   static const String _jsCodeStorageVersionKey = 'js_service_version_';

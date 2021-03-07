@@ -10,8 +10,6 @@ void main() async {
   await GetStorage.init(get_storage_container);
 
   final _plugins = [
-    // PluginKusama(name: 'polkadot'),
-    // PluginKusama(),
     PluginNuchain(name: 'nuchain')
   ];
 

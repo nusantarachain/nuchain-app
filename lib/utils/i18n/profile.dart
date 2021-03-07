@@ -26,7 +26,7 @@ const Map<String, String> enProfile = {
   'setting.prefix.list': 'Available Prefixes',
   'setting.lang': 'Language',
   'setting.lang.auto': 'Auto Detect',
-  'setting.network': 'Select Wallet',
+  'setting.network': 'Select Account',
   'about': 'About',
   'name.change': 'Change Name',
   'pass.change': 'Change Password',
