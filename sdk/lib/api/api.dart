@@ -9,7 +9,7 @@ import 'package:polkawallet_sdk/api/apiStaking.dart';
 import 'package:polkawallet_sdk/api/apiTx.dart';
 import 'package:polkawallet_sdk/api/apiUOS.dart';
 import 'package:polkawallet_sdk/api/apiWalletConnect.dart';
-import 'package:polkawallet_sdk/api/subscan.dart';
+import 'package:polkawallet_sdk/api/arascan.dart';
 import 'package:polkawallet_sdk/api/types/networkParams.dart';
 import 'package:polkawallet_sdk/service/index.dart';
 import 'package:polkawallet_sdk/storage/keyring.dart';
@@ -42,7 +42,7 @@ class PolkawalletApi {
 
   ApiWalletConnect walletConnect;
 
-  final SubScanApi subScan = SubScanApi();
+  final AraScanApi subScan = AraScanApi();
 
   void init() {
     keyring = ApiKeyring(this, service.keyring);
