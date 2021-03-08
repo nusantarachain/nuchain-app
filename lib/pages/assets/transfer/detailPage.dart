@@ -39,7 +39,7 @@ class TransferDetailPage extends StatelessWidget {
       eventId: tx.extrinsicIndex,
       hash: tx.hash,
       blockTime: Fmt.dateTime(
-          DateTime.fromMillisecondsSinceEpoch(tx.blockTimestamp * 1000)),
+          DateTime.fromMillisecondsSinceEpoch(tx.blockTimestamp)),
       blockNum: tx.blockNum,
       networkName: networkName,
       infoItems: <TxDetailInfoItem>[

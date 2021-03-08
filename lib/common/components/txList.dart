@@ -23,7 +23,7 @@ class TxList extends StatelessWidget {
             ),
             title: Text(txs[i].call),
             subtitle: Text(Fmt.dateTime(DateTime.fromMillisecondsSinceEpoch(
-                txs[i].blockTimestamp * 1000))),
+                txs[i].blockTimestamp))),
             trailing: Container(
               width: 80,
               child: Text(txs[i].txNumber),

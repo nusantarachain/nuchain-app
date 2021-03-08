@@ -115,7 +115,7 @@ class _StakingActions extends State<StakingActions>
           ),
           title: Text(i.call),
           subtitle: Text(Fmt.dateTime(
-              DateTime.fromMillisecondsSinceEpoch(i.blockTimestamp * 1000))),
+              DateTime.fromMillisecondsSinceEpoch(i.blockTimestamp))),
           trailing: i.success
               ? Text(
                   dic['success'],
@@ -161,7 +161,7 @@ class _StakingActions extends State<StakingActions>
           ),
           title: Text(i.eventId),
           subtitle: Text(Fmt.dateTime(
-              DateTime.fromMillisecondsSinceEpoch(i.blockTimestamp * 1000))),
+              DateTime.fromMillisecondsSinceEpoch(i.blockTimestamp))),
           trailing: Text('${Fmt.balance(i.amount, decimals)} $symbol'),
           onTap: () {
             Navigator.of(context)

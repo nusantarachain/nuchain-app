@@ -37,7 +37,7 @@ class RewardDetailPage extends StatelessWidget {
         ),
       ],
       blockTime: Fmt.dateTime(
-          DateTime.fromMillisecondsSinceEpoch(detail.blockTimestamp * 1000)),
+          DateTime.fromMillisecondsSinceEpoch(detail.blockTimestamp)),
       blockNum: detail.blockNum,
     );
   }

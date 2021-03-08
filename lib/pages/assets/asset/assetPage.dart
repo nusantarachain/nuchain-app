@@ -531,7 +531,7 @@ class TransferListItem extends StatelessWidget {
             : Icon(Icons.error, color: Colors.red, size: 28),
         title: Text('$title${crossChain != null ? ' ($crossChain)' : ''}'),
         subtitle: Text(Fmt.dateTime(
-            DateTime.fromMillisecondsSinceEpoch(data.blockTimestamp * 1000))),
+            DateTime.fromMillisecondsSinceEpoch(data.blockTimestamp))),
         trailing: Container(
           width: 110,
           child: Row(

@@ -66,7 +66,7 @@ class TxDetailPage extends StatelessWidget {
       eventId: detail.txNumber,
       infoItems: info,
       blockTime: Fmt.dateTime(
-          DateTime.fromMillisecondsSinceEpoch(detail.blockTimestamp * 1000)),
+          DateTime.fromMillisecondsSinceEpoch(detail.blockTimestamp)),
       blockNum: detail.blockNum,
     );
   }

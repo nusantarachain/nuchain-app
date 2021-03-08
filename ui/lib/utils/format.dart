@@ -4,11 +4,12 @@ import 'package:intl/intl.dart';
 import 'package:polkawallet_sdk/api/types/balanceData.dart';
 
 class Fmt {
+  static final localDateFormat = new DateFormat("dd/MM/yyyy hh:mm");
   static String dateTime(DateTime time) {
     if (time == null) {
       return 'date-time';
     }
-    return DateFormat.yMd().add_Hm().format(time);
+    return Fmt.localDateFormat.format(time);
   }
 
   static String blockToTime(int blocks, int blockDuration) {
