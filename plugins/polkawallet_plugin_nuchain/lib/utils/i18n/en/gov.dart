@@ -76,6 +76,5 @@ const Map<String, String> enGov = {
   'locked': 'locked for',
   'locked.no': 'no lockup period(0.1x)',
   'day': 'days',
-  'detail': 'Details',
-  'polkassembly': 'Discussion platform for polkadot governance',
+  'detail': 'Details'
 };

@@ -106,27 +106,27 @@ class Gov extends StatelessWidget {
                             onTap: () => Navigator.of(context)
                                 .pushNamed(TreasuryPage.route),
                           ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: 16),
-                          child: GestureDetector(
-                            child: EntryPageCard(
-                              'Polkassembly',
-                              dic['polkassembly'],
-                              Image.asset(
-                                'packages/polkawallet_plugin_nuchain/assets/images/public/polkassembly.png',
-                                width: 56,
-                              ),
-                              color: Colors.black87,
-                            ),
-                            onTap: () => Navigator.of(context).pushNamed(
-                              DAppWrapperPage.route,
-                              arguments:
-                                  'https://${plugin.basic.name}.polkassembly.io/',
-                              // "https://polkadot.js.org/apps/",
-                            ),
-                          ),
-                        ),
+                        )
+                        // Padding(
+                        //   padding: EdgeInsets.only(bottom: 16),
+                        //   child: GestureDetector(
+                        //     child: EntryPageCard(
+                        //       'Polkassembly',
+                        //       dic['polkassembly'],
+                        //       Image.asset(
+                        //         'packages/polkawallet_plugin_nuchain/assets/images/public/polkassembly.png',
+                        //         width: 56,
+                        //       ),
+                        //       color: Colors.black87,
+                        //     ),
+                        //     onTap: () => Navigator.of(context).pushNamed(
+                        //       DAppWrapperPage.route,
+                        //       arguments:
+                        //           'https://${plugin.basic.name}.polkassembly.io/',
+                        //       // "https://polkadot.js.org/apps/",
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
             )
