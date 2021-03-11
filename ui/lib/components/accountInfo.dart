@@ -62,14 +62,14 @@ class AccountInfo extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(right: 16),
               child: JumpToBrowserLink(
-                'https://polkascan.io/$network/account/$address',
-                text: 'Polkascan',
+                'https://scan.nuchain.network/account/$address',
+                text: 'Arascan',
               ),
             ),
-            JumpToBrowserLink(
-              'https://$network.subscan.io/account/$address',
-              text: 'Subscan',
-            ),
+            // JumpToBrowserLink(
+            //   'https://$network.subscan.io/account/$address',
+            //   text: 'Subscan',
+            // ),
           ],
         ),
         accInfo == null
