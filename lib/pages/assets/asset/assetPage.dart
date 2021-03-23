@@ -272,10 +272,11 @@ class _AssetPageState extends State<AssetPage>
             }
 
             String tokenPrice;
-            if (widget.service.store.assets.marketPrices[symbol] != null &&
+            double perUnitPrice = widget.service.store.assets.marketPrices[symbol];
+            if (perUnitPrice != null &&
                 balancesInfo != null) {
               tokenPrice = Fmt.priceFloor(
-                  widget.service.store.assets.marketPrices[symbol] *
+                  perUnitPrice *
                       Fmt.bigIntToDouble(balance, decimals));
             }
 

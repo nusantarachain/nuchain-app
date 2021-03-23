@@ -250,12 +250,18 @@ class _AssetsState extends State<AssetsPage> {
         final tokens = widget.service.plugin.balances.tokens;
         final extraTokens = widget.service.plugin.balances.extraTokens;
 
+        // String tokenPrice;
+        // if (widget.service.store.assets.marketPrices[symbol] != null &&
+        //     balancesInfo != null) {
+        //   tokenPrice = Fmt.priceCeil(
+        //       widget.service.store.assets.marketPrices[symbol] *
+        //           Fmt.bigIntToDouble(Fmt.balanceTotal(balancesInfo), decimals));
+        // }
         String tokenPrice;
-        if (widget.service.store.assets.marketPrices[symbol] != null &&
-            balancesInfo != null) {
-          tokenPrice = Fmt.priceCeil(
-              widget.service.store.assets.marketPrices[symbol] *
-                  Fmt.bigIntToDouble(Fmt.balanceTotal(balancesInfo), decimals));
+        double perUnitPrice = widget.service.store.assets.marketPrices[symbol];
+        if (perUnitPrice != null && balancesInfo != null) {
+          tokenPrice = Fmt.priceFloor(perUnitPrice *
+              Fmt.bigIntToDouble(Fmt.balanceTotal(balancesInfo), decimals));
         }
 
         return Scaffold(
@@ -367,7 +373,19 @@ class _AssetsState extends State<AssetsPage> {
                           width: 36,
                           child: widget.service.plugin.tokenIcons[symbol],
                         ),
-                        title: Text(symbol),
+                        // title: Text(symbol),
+                        title: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(symbol),
+                            Text(perUnitPrice == null ? "-" : "Rp. " + Fmt.priceFloor(perUnitPrice, lengthFixed: 2), 
+                              style: TextStyle(
+                                color: Theme.of(context).disabledColor,
+                                fontSize: 14
+                              )),
+                          ]
+                        ),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.end,
