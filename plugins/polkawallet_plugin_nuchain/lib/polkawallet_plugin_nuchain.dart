@@ -96,6 +96,10 @@ class PluginNuchain extends PolkawalletPlugin {
     //     'packages/polkawallet_plugin_nuchain/assets/images/tokens/DOT.png'),
     'ARA': Image.asset(
         'packages/polkawallet_plugin_nuchain/assets/images/tokens/ARA.png'),
+    'NCO': Image.asset(
+        'packages/polkawallet_plugin_nuchain/assets/images/tokens/NCO.png')
+    // 'MBS': Image.asset(
+    //     'packages/polkawallet_plugin_nuchain/assets/images/tokens/MBS.png'),
   };
 
   @override

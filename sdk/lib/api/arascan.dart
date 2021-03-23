@@ -252,4 +252,45 @@ class AraScanApi {
     }
     return {};
   }
+
+
+
+  Future<Map> fetchExtraTokensAsync(String network) async {
+    Completer completer = new Completer<Map>();
+    ReceivePort receivePort = ReceivePort();
+    Isolate isolateIns = await Isolate.spawn(
+        AraScanApi.fetchExtraTokens,
+        AraScanRequestParams(
+          sendPort: receivePort.sendPort,
+          network: network,
+        ));
+    receivePort.listen((msg) {
+      receivePort.close();
+      isolateIns.kill(priority: Isolate.immediate);
+      completer.complete(msg);
+    });
+    return completer.future;
+  }
+
+  static Future<Map> fetchExtraTokens(AraScanRequestParams para) async {
+    String url = '${getSnEndpoint(para.network)}/registered_tokens';
+    Map<String, String> headers = {"Content-type": "application/json"};
+
+    Response res = await get(url, headers: headers);
+    if (res.body != null) {
+      try {
+        final obj = await compute(jsonDecode, res.body);
+        if (para.sendPort != null) {
+          para.sendPort.send(obj['data']);
+        }
+        return obj['data'];
+      } catch (err) {
+        // ignore error
+      }
+    }
+    if (para.sendPort != null) {
+      para.sendPort.send({});
+    }
+    return {};
+  }
 }

@@ -149,6 +149,41 @@ async function getBalance(
 }
 
 /**
+ * get extra tokens
+ */
+async function getTokensBalance(
+  api: ApiPromise,
+  address: string,
+  tokens: string[],
+  msgChannel: string
+) {
+  const transfrom = (res: any) => {
+    const lockedBreakdown = res.lockedBreakdown.map((i: any) => {
+      return {
+        ...i,
+        use: hexToString(i.id.toHex()),
+      };
+    });
+    return {
+      ...res,
+      lockedBreakdown,
+    };
+  };
+  if (msgChannel) {
+    subscribeMessage(api.derive.balances.all, [address], msgChannel, transfrom);
+    return;
+  }
+
+  Promise.all([
+      api.query.assets.metadata()
+  ]);
+
+//   const res = await api.derive.balances.all(address);
+  const res = await api.query.assets.metadata
+  return transfrom(res);
+}
+
+/**
  * get humen info of addresses
  */
 async function getAccountIndex(api: ApiPromise, addresses: string[]) {

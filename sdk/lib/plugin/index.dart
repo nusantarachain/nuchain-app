@@ -5,6 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:polkawallet_sdk/api/types/balanceData.dart';
 import 'package:polkawallet_sdk/api/types/networkStateData.dart';
 import 'package:polkawallet_sdk/plugin/store/balances.dart';
+import 'package:polkawallet_sdk/plugin/store/tokenData.dart';
 import 'package:polkawallet_sdk/polkawallet_sdk.dart';
 import 'package:polkawallet_sdk/api/types/networkParams.dart';
 import 'package:polkawallet_sdk/plugin/homeNavItem.dart';
@@ -16,6 +17,7 @@ const String sdk_cache_key = 'polka_wallet_sdk_cache';
 const String net_state_cache_key = 'network_state';
 const String net_const_cache_key = 'network_const';
 const String balance_cache_key = 'balances';
+const String token_cache_key = 'tokens';
 
 abstract class PolkawalletPlugin implements PolkawalletPluginBase {
   /// A plugin has a [WalletSDK] instance for connecting to it's node.
@@ -45,6 +47,8 @@ abstract class PolkawalletPlugin implements PolkawalletPluginBase {
   String _getNetworkCacheKey(String key) => '${key}_${basic.name}';
   String _getBalanceCacheKey(String pubKey) =>
       '${balance_cache_key}_${basic.name}_$pubKey';
+  String _getTokensCacheKey(String pubKey) =>
+      '${token_cache_key}_${basic.name}_$pubKey';
 
   Future<void> updateNetworkState() async {
     final state = await Future.wait([
@@ -66,6 +70,19 @@ abstract class PolkawalletPlugin implements PolkawalletPluginBase {
       acc,
       BalanceData.fromJson(Map<String, dynamic>.from(
           _cache.read(_getBalanceCacheKey(acc.pubKey)) ?? {})),
+    );
+  }
+
+  void updateExtraTokens(KeyPairData acc, ExtraTokenDataList data) {
+    balances.setExtraTokens(data);
+    _cache.write(_getTokensCacheKey(acc.pubKey), data.toJson());
+  }
+
+  void loadExtraTokens(KeyPairData acc) {
+    updateExtraTokens(
+      acc,
+      ExtraTokenDataList.fromJson(Map<String, dynamic>.from(
+          _cache.read(_getTokensCacheKey(acc.pubKey)) ?? {})),
     );
   }
 
@@ -104,6 +121,29 @@ abstract class PolkawalletPlugin implements PolkawalletPluginBase {
           (BalanceData data) {
         updateBalances(keyring.current, data);
       });
+
+      // fill extra tokens
+      final extraTokens = ExtraTokenDataList.load([
+        ExtraTokenData.fromJson({
+          "title": "Tokens",
+          "tokens": [
+            {
+              "name": "ENCOIN",
+              "symbol": "NCO",
+              "amount": "100",
+              "detailPageRoute": "/detail"
+            },
+            {
+              "name": "MENARA",
+              "symbol": "MBS",
+              "amount": "350",
+              "detailPageRoute": "/detail"
+            }
+          ]
+        })
+      ]);
+      print("ExtraTokens: $extraTokens");
+      updateExtraTokens(keyring.current, extraTokens);
     }
 
     onStarted(keyring);
@@ -149,7 +189,7 @@ abstract class PolkawalletPluginBase {
 
   /// Plugin should define a list of node to connect
   /// for users of Polkawallet App.
-  List<NetworkParams> get nodeList => List<NetworkParams>();
+  List<NetworkParams> get nodeList => List.empty();
 
   /// Plugin should provide [tokenIcons]
   /// for display in Assets page of Polkawallet App.
@@ -158,7 +198,7 @@ abstract class PolkawalletPluginBase {
   /// The [getNavItems] method returns a list of [HomeNavItem] which defines
   /// the [Widget] to be used in home page of polkawallet App.
   List<HomeNavItem> getNavItems(BuildContext context, Keyring keyring) =>
-      List<HomeNavItem>();
+      List.empty();
 
   /// App will add plugin's pages with custom [routes].
   Map<String, WidgetBuilder> getRoutes(Keyring keyring) =>

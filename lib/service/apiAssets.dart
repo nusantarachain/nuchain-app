@@ -39,7 +39,32 @@ class ApiAssets {
       print('fetch market price failed');
       return;
     }
-    final String token = res['token'][0];
-    apiRoot.store.assets.setMarketPrices(token, res['detail'][token]['price']);
+
+    List<String> tokens = res['token'];
+    // final String token = res['token'][0];
+
+    tokens.forEach((token) => {
+          apiRoot.store.assets
+              .setMarketPrices(token, res['detail'][token]['price'])
+        });
+  }
+
+
+  Future<void> fetchExtraTokens() async {
+    if (apiRoot.plugin.basic.isTestNet) return;
+
+    final Map res =
+        await apiRoot.araScan.fetchExtraTokensAsync(apiRoot.plugin.basic.name);
+    if (res == null || res['tokens'] == null) {
+      print('fetch market price failed');
+      return;
+    }
+
+    List<String> tokens = res['tokens'];
+
+    tokens.forEach((token) => {
+          apiRoot.store.assets
+              .setMarketPrices(token, res['detail'][token]['price'])
+        });
   }
 }

@@ -139,6 +139,10 @@ async function getBalance(
   return transfrom(res);
 }
 
+async function getAssets(api: ApiPromise, address: string){
+    // unimplemented
+}
+
 /**
  * get humen info of addresses
  */

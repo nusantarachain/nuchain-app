@@ -14,7 +14,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:polkawallet_sdk/api/types/networkParams.dart';
 import 'package:polkawallet_sdk/plugin/index.dart';
-import 'package:polkawallet_sdk/plugin/store/balances.dart';
+import 'package:polkawallet_sdk/plugin/store/tokenData.dart';
 import 'package:polkawallet_sdk/utils/i18n.dart';
 import 'package:polkawallet_ui/components/addressIcon.dart';
 import 'package:polkawallet_ui/components/roundedCard.dart';
@@ -248,15 +248,10 @@ class _AssetsState extends State<AssetsPage> {
 
         final balancesInfo = widget.service.plugin.balances.native;
         final tokens = widget.service.plugin.balances.tokens;
+
+        // token lain selain token native apabila ada
         final extraTokens = widget.service.plugin.balances.extraTokens;
 
-        // String tokenPrice;
-        // if (widget.service.store.assets.marketPrices[symbol] != null &&
-        //     balancesInfo != null) {
-        //   tokenPrice = Fmt.priceCeil(
-        //       widget.service.store.assets.marketPrices[symbol] *
-        //           Fmt.bigIntToDouble(Fmt.balanceTotal(balancesInfo), decimals));
-        // }
         String tokenPrice;
         double perUnitPrice = widget.service.store.assets.marketPrices[symbol];
         if (perUnitPrice != null && balancesInfo != null) {
@@ -375,17 +370,20 @@ class _AssetsState extends State<AssetsPage> {
                         ),
                         // title: Text(symbol),
                         title: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(symbol),
-                            Text(perUnitPrice == null ? "-" : "Rp. " + Fmt.priceFloor(perUnitPrice, lengthFixed: 2), 
-                              style: TextStyle(
-                                color: Theme.of(context).disabledColor,
-                                fontSize: 14
-                              )),
-                          ]
-                        ),
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(symbol),
+                              Text(
+                                  perUnitPrice == null
+                                      ? "-"
+                                      : "Rp. " +
+                                          Fmt.priceFloor(perUnitPrice,
+                                              lengthFixed: 2),
+                                  style: TextStyle(
+                                      color: Theme.of(context).disabledColor,
+                                      fontSize: 14)),
+                            ]),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.end,
@@ -433,7 +431,7 @@ class _AssetsState extends State<AssetsPage> {
                     Column(
                       children: extraTokens == null || extraTokens.length == 0
                           ? [Container()]
-                          : extraTokens.map((ExtraTokenData i) {
+                          : extraTokens.data.map((ExtraTokenData i) {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -493,8 +491,7 @@ class TokenItem extends StatelessWidget {
         ),
         title: Text(item.name),
         trailing: Text(
-          Fmt.priceFloorBigInt(Fmt.balanceInt(item.amount), decimals,
-              lengthFixed: 4),
+          item.amount,
           style: TextStyle(
               fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black54),
         ),

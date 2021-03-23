@@ -1,5 +1,6 @@
 import 'package:mobx/mobx.dart';
 import 'package:polkawallet_sdk/api/types/balanceData.dart';
+import 'package:polkawallet_sdk/plugin/store/tokenData.dart';
 
 part 'balances.g.dart';
 
@@ -13,7 +14,7 @@ abstract class BalancesStoreBase with Store {
   List<TokenBalanceData> tokens;
 
   @observable
-  List<ExtraTokenData> extraTokens;
+  ExtraTokenDataList extraTokens;
 
   @action
   void setBalance(BalanceData data) {
@@ -26,23 +27,7 @@ abstract class BalancesStoreBase with Store {
   }
 
   @action
-  void setExtraTokens(List<ExtraTokenData> ls) {
+  void setExtraTokens(ExtraTokenDataList ls) {
     extraTokens = ls;
   }
-}
-
-class ExtraTokenData {
-  ExtraTokenData({this.title, this.tokens});
-  final String title;
-  final List<TokenBalanceData> tokens;
-}
-
-class TokenBalanceData {
-  TokenBalanceData({this.name, this.symbol, this.amount, this.detailPageRoute});
-
-  final String name;
-  final String symbol;
-  final String amount;
-
-  final String detailPageRoute;
 }

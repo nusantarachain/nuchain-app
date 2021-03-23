@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:polkawallet_sdk/api/api.dart';
 import 'package:polkawallet_sdk/api/types/balanceData.dart';
 import 'package:polkawallet_sdk/service/account.dart';
@@ -45,6 +47,26 @@ class ApiAccount {
 
   /// unsubscribe balance
   void unsubscribeBalance() {
+    final msgChannel = 'Balance';
+    apiRoot.unsubscribeMessage(msgChannel);
+  }
+
+  /// subscribe balance
+  /// @return [String] msgChannel, call unsubscribeMessage(msgChannel) to unsub.
+  Future<String> subscribeTokensBalance(
+    String address,
+    List<String> tokens,
+    Function(BalanceData) onUpdate,
+  ) async {
+    final msgChannel = 'Balance';
+    final code = 'account.getTokensBalance(api, "$address", "${jsonEncode(tokens)}", "$msgChannel")';
+    await apiRoot.service.webView.subscribeMessage(
+        code, msgChannel, (data) => onUpdate(BalanceData.fromJson(data)));
+    return msgChannel;
+  }
+
+  /// unsubscribe balance
+  void unsubscribeTokensBalance() {
     final msgChannel = 'Balance';
     apiRoot.unsubscribeMessage(msgChannel);
   }

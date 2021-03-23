@@ -51,6 +51,7 @@ flutter:
     - assets/images/staking/reward.svg
     - assets/images/staking/slash.svg
     - assets/images/tokens/ARA.png
+    - assets/images/tokens/NCO.png
     # - assets/images/public/polkassembly.png
     # - assets/js/main.js
   #
