@@ -113,12 +113,6 @@ class _TransferPageState extends State<TransferPage> {
       final TransferPageParams args = ModalRoute.of(context).settings.arguments;
       if (args.address != null) {
         _initAccountTo(args.address);
-      } else {
-        if (widget.service.keyring.allWithContacts.length > 0) {
-          setState(() {
-            _accountTo = widget.service.keyring.allWithContacts[0];
-          });
-        }
       }
     });
   }
