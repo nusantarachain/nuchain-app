@@ -54,7 +54,7 @@ class AraScanApi {
     //   network = 'acala-testnet';
     // }
     // // return 'https://$network.AraScan.io/api/scan';
-    // return 'http://10.0.2.2:4399/api/scan';
+    //return 'http://10.0.2.2:8089';
     return 'https://scan.nuchain.network/api';
   }
 
@@ -115,21 +115,47 @@ class AraScanApi {
     return completer.future;
   }
 
-  Future<Map> fetchRewardTxsAsync({
+  Future<Map> fetchAccountStakingTxsAsync({
     int skip = 0,
     int size = tx_list_skip_size,
-    String sender,
+    String stashId,
     String network = 'nuchain',
   }) async {
     Completer completer = new Completer<Map>();
 
     ReceivePort receivePort = ReceivePort();
     Isolate isolateIns = await Isolate.spawn(
-        AraScanApi.fetchRewardTxs,
+        AraScanApi.fetchAccountStakingTxs,
         AraScanRequestParams(
           sendPort: receivePort.sendPort,
           network: network,
-          address: sender,
+          address: stashId,
+          skip: skip,
+          limit: tx_list_skip_size,
+        ));
+    receivePort.listen((msg) {
+      receivePort.close();
+      isolateIns.kill(priority: Isolate.immediate);
+      completer.complete(msg);
+    });
+    return completer.future;
+  }
+
+  Future<Map> fetchAccountStakingRewardsSlashesTxsAsync({
+    int skip = 0,
+    int size = tx_list_skip_size,
+    String stashId,
+    String network = 'nuchain',
+  }) async {
+    Completer completer = new Completer<Map>();
+
+    ReceivePort receivePort = ReceivePort();
+    Isolate isolateIns = await Isolate.spawn(
+        AraScanApi.fetchAccountStakingRewardsSlashesTxs,
+        AraScanRequestParams(
+          sendPort: receivePort.sendPort,
+          network: network,
+          address: stashId,
           skip: skip,
           limit: tx_list_skip_size,
         ));
@@ -142,7 +168,8 @@ class AraScanApi {
   }
 
   static Future<Map> fetchTransfers(AraScanRequestParams params) async {
-    String url = '${getSnEndpoint(params.network)}/account/${params.address}/transfers?skip=${params.skip}&limit=${params.limit}';
+    String url =
+        '${getSnEndpoint(params.network)}/account/${params.address}/transfers?skip=${params.skip}&limit=${params.limit}';
     Map<String, String> headers = {
       "Content-type": "application/json",
       "Accept": "*/*"
@@ -191,25 +218,47 @@ class AraScanApi {
     return {};
   }
 
-  static Future<Map> fetchRewardTxs(AraScanRequestParams para) async {
-    String url = '${getSnEndpoint(para.network)}/account/reward_slash';
-    Map<String, String> headers = {"Content-type": "application/json"};
-    Map params = {
-      "address": para.address,
-      "skip": para.skip,
-      "limit": para.limit,
+  static Future<Map> fetchAccountStakingTxs(AraScanRequestParams params) async {
+    String url =
+        '${getSnEndpoint(params.network)}/account/${params.address}/staking_txs?skip=${params.skip}&limit=${params.limit}';
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+      "Accept": "*/*"
     };
-    String body = jsonEncode(params);
-    Response res = await post(url, headers: headers, body: body);
+    print("fetching: $url");
+    Response res = await get(url, headers: headers);
     if (res.body != null) {
       final obj = await compute(jsonDecode, res.body);
-      if (para.sendPort != null) {
-        para.sendPort.send(obj['data']);
+      if (params.sendPort != null) {
+        params.sendPort.send(obj['data']);
       }
       return obj['data'];
     }
-    if (para.sendPort != null) {
-      para.sendPort.send({});
+    if (params.sendPort != null) {
+      params.sendPort.send({});
+    }
+    return {};
+  }
+
+  static Future<Map> fetchAccountStakingRewardsSlashesTxs(
+      AraScanRequestParams params) async {
+    String url =
+        '${getSnEndpoint(params.network)}/account/${params.address}/rewards_slashes?skip=${params.skip}&limit=${params.limit}';
+    Map<String, String> headers = {
+      "Content-type": "application/json",
+      "Accept": "*/*"
+    };
+    print("fetching: $url");
+    Response res = await get(url, headers: headers);
+    if (res.body != null) {
+      final obj = await compute(jsonDecode, res.body);
+      if (params.sendPort != null) {
+        params.sendPort.send(obj['data']);
+      }
+      return obj['data'];
+    }
+    if (params.sendPort != null) {
+      params.sendPort.send({});
     }
     return {};
   }
@@ -252,8 +301,6 @@ class AraScanApi {
     }
     return {};
   }
-
-
 
   Future<Map> fetchExtraTokensAsync(String network) async {
     Completer completer = new Completer<Map>();

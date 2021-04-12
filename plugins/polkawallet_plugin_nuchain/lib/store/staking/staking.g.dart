@@ -162,13 +162,13 @@ mixin _$StakingStore on _StakingStore, Store {
   final _$txsAtom = Atom(name: '_StakingStore.txs');
 
   @override
-  ObservableList<TxData> get txs {
+  ObservableList<TxRewardData> get txs {
     _$txsAtom.reportRead();
     return super.txs;
   }
 
   @override
-  set txs(ObservableList<TxData> value) {
+  set txs(ObservableList<TxRewardData> value) {
     _$txsAtom.reportWrite(value, super.txs, () {
       super.txs = value;
     });

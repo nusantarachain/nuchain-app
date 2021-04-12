@@ -40,15 +40,17 @@ class ApiAssets {
       return;
     }
 
-    List<String> tokens = res['token'];
+    List<dynamic> tokens = res['token'];
     // final String token = res['token'][0];
 
     tokens.forEach((token) => {
-          apiRoot.store.assets
-              .setMarketPrices(token, res['detail'][token]['price'])
+          if (token is String)
+            apiRoot.store.assets
+                .setMarketPrices(token, res['detail'][token]['price'])
+          else
+            print('Token is not a string: $token')
         });
   }
-
 
   Future<void> fetchExtraTokens() async {
     if (apiRoot.plugin.basic.isTestNet) return;

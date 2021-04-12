@@ -22,13 +22,13 @@ import 'package:polkawallet_sdk/api/types/staking/ownStashInfo.dart';
 import 'package:polkawallet_sdk/storage/keyring.dart';
 import 'package:polkawallet_sdk/storage/types/keyPairData.dart';
 import 'package:polkawallet_sdk/utils/i18n.dart';
-import 'package:polkawallet_ui/components/listTail.dart';
-import 'package:polkawallet_ui/components/roundedCard.dart';
 import 'package:polkawallet_ui/components/addressIcon.dart';
+import 'package:polkawallet_ui/components/listTail.dart';
 import 'package:polkawallet_ui/components/outlinedCircle.dart';
+import 'package:polkawallet_ui/components/roundedCard.dart';
+import 'package:polkawallet_ui/utils/format.dart';
 import 'package:polkawallet_ui/utils/i18n.dart';
 import 'package:polkawallet_ui/utils/index.dart';
-import 'package:polkawallet_ui/utils/format.dart';
 
 class StakingActions extends StatefulWidget {
   StakingActions(this.plugin, this.keyring);
@@ -64,8 +64,8 @@ class _StakingActions extends State<StakingActions>
       });
 
       if (res == null ||
-          res['extrinsics'] == null ||
-          res['extrinsics'].length < tx_list_page_size) {
+          res['entries'] == null ||
+          res['entries'].length < tx_list_page_size) {
         setState(() {
           _isLastPage = true;
         });
@@ -99,6 +99,9 @@ class _StakingActions extends State<StakingActions>
 
   List<Widget> _buildTxList() {
     final dic = I18n.of(context).getDic(i18n_full_dic_nuchain, 'common');
+    final int decimals = widget.plugin.networkState.tokenDecimals[0];
+    final String symbol = widget.plugin.networkState.tokenSymbol[0];
+
     List<Widget> res = [];
     res.addAll(widget.plugin.store.staking.txs.map((i) {
       return Container(
@@ -107,24 +110,16 @@ class _StakingActions extends State<StakingActions>
           leading: Container(
             width: 32,
             padding: EdgeInsets.only(top: 4),
-            child: i.success
+            child: true //TODO: i.success
                 ? Image.asset(
                     'packages/polkawallet_plugin_nuchain/assets/images/staking/ok.png')
                 : Image.asset(
                     'packages/polkawallet_plugin_nuchain/assets/images/staking/error.png'),
           ),
-          title: Text(i.call),
+          title: Text(i.eventId),
           subtitle: Text(Fmt.dateTime(
               DateTime.fromMillisecondsSinceEpoch(i.blockTimestamp))),
-          trailing: i.success
-              ? Text(
-                  dic['success'],
-                  style: TextStyle(color: Colors.green),
-                )
-              : Text(
-                  dic['failed'],
-                  style: TextStyle(color: Colors.pink),
-                ),
+          trailing: Text('${Fmt.balance(i.amount, decimals)} $symbol'),
           onTap: () {
             Navigator.of(context)
                 .pushNamed(StakingDetailPage.route, arguments: i);
