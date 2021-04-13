@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:polkawallet_sdk/api/api.dart';
 import 'package:polkawallet_sdk/api/types/balanceData.dart';
+import 'package:polkawallet_sdk/plugin/store/tokenData.dart';
 import 'package:polkawallet_sdk/service/account.dart';
 
 class ApiAccount {
@@ -56,18 +57,20 @@ class ApiAccount {
   Future<String> subscribeTokensBalance(
     String address,
     List<String> tokens,
-    Function(BalanceData) onUpdate,
+    Function(ExtraTokenDataList) onUpdate,
   ) async {
-    final msgChannel = 'Balance';
-    final code = 'account.getTokensBalance(api, "$address", "${jsonEncode(tokens)}", "$msgChannel")';
+    final msgChannel = 'TokensBalance';
+    final code = 'account.getTokensBalance(api, "$address", ${jsonEncode(tokens)}, "$msgChannel");';
+    print("getting token balance");
+    print(code);
     await apiRoot.service.webView.subscribeMessage(
-        code, msgChannel, (data) => onUpdate(BalanceData.fromJson(data)));
+        code, msgChannel, (data) => onUpdate(ExtraTokenDataList.fromJson(data)));
     return msgChannel;
   }
 
   /// unsubscribe balance
   void unsubscribeTokensBalance() {
-    final msgChannel = 'Balance';
+    final msgChannel = 'TokensBalance';
     apiRoot.unsubscribeMessage(msgChannel);
   }
 

@@ -121,29 +121,36 @@ abstract class PolkawalletPlugin implements PolkawalletPluginBase {
           (BalanceData data) {
         updateBalances(keyring.current, data);
       });
+      
+      
+      sdk.api.account.subscribeTokensBalance(keyring.current.address, 
+        ["NCO", "MENARA", "MADU"], 
+        (ExtraTokenDataList data){
+          updateExtraTokens(keyring.current, data);
+        });
 
-      // fill extra tokens
-      final extraTokens = ExtraTokenDataList.load([
-        ExtraTokenData.fromJson({
-          "title": "Tokens",
-          "tokens": [
-            {
-              "name": "ENCOIN",
-              "symbol": "NCO",
-              "amount": "100",
-              "detailPageRoute": "/detail"
-            },
-            {
-              "name": "MENARA",
-              "symbol": "MBS",
-              "amount": "350",
-              "detailPageRoute": "/detail"
-            }
-          ]
-        })
-      ]);
-      print("ExtraTokens: $extraTokens");
-      updateExtraTokens(keyring.current, extraTokens);
+      // // fill extra tokens
+      // final extraTokens = ExtraTokenDataList.load([
+      //   ExtraTokenData.fromJson({
+      //     "title": "Tokens",
+      //     "tokens": [
+      //       {
+      //         "name": "ENCOIN",
+      //         "symbol": "NCO",
+      //         "amount": "100",
+      //         "detailPageRoute": "/detail"
+      //       },
+      //       {
+      //         "name": "MENARA",
+      //         "symbol": "MBS",
+      //         "amount": "350",
+      //         "detailPageRoute": "/detail"
+      //       }
+      //     ]
+      //   })
+      // ]);
+      // print("ExtraTokens: $extraTokens");
+      // updateExtraTokens(keyring.current, extraTokens);
     }
 
     onStarted(keyring);

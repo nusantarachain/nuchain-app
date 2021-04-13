@@ -170,16 +170,17 @@ async function getTokensBalance(
     };
   };
   if (msgChannel) {
-    subscribeMessage(api.derive.balances.all, [address], msgChannel, transfrom);
+    // subscribeMessage(api.derive.assets.all, [address], msgChannel, transfrom);
     return;
   }
 
-  Promise.all([
+  const res = await Promise.all([
       api.query.assets.metadata()
   ]);
 
 //   const res = await api.derive.balances.all(address);
-  const res = await api.query.assets.metadata
+//   const res = await api.query.assets.metadata
+    // console.log(res);
   return transfrom(res);
 }
 
@@ -201,4 +202,5 @@ export default {
   queryAccountsBonded,
   getBalance,
   getAccountIndex,
+  getTokensBalance
 };

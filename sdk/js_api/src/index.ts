@@ -47,6 +47,16 @@ async function connect(nodes: string[]) {
   });
 }
 
+/**
+ * Helper function to connect to known public testnet
+ * this code for development purpose.
+ */
+async function testnetConnect(){
+    const endpoint = "wss://testnet.nuchain.riset.tech";
+    const connected = connect([endpoint]);
+    console.log("Testnet Connected")
+}
+
 const test = async () => {
   // const props = await api.rpc.system.properties();
   // send("log", props);
@@ -55,6 +65,7 @@ const test = async () => {
 const settings = {
   test,
   connect,
+  testnetConnect,
   subscribeMessage,
   getNetworkConst,
   getNetworkProperties,

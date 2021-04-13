@@ -77,10 +77,10 @@ async function disconnect(param: SessionTypes.DeleteParams) {
 async function approveProposal(proposal: SessionTypes.Proposal, address: string) {
   const response: SessionTypes.Response = {
     metadata: {
-      name: "Polkawallet",
-      description: "Mobile wallet for polkadot ecosystem.",
+      name: "Nuchain Vault",
+      description: "Nuchain Vault App.",
       url: "#",
-      icons: ["https://polkawallet.io/images/logo.png"],
+      icons: ["https://nuchain.id/images/logo.png"],
     },
     state: {
       accounts: [address],

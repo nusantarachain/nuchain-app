@@ -8,6 +8,13 @@ const node_list_nuchain = [
     'name': 'Nuchain (hosted by Rantai Nusantara)',
     'ss58': 42,
     'endpoint': 'wss://node-sg.nuchain.riset.tech',
+  },
+  // hanya untuk testing/development
+  // comment out endpoint testnet ini ketika build untuk production
+  {
+    'name': 'Nuchain Testnet (hosted by Rantai Nusantara)',
+    'ss58': 42,
+    'endpoint': 'wss://testnet.nuchain.riset.tech',
   }
 ];
 const node_list_polkadot = [

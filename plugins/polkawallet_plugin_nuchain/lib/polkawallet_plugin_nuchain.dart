@@ -208,7 +208,7 @@ class PluginNuchain extends PolkawalletPlugin {
 
   List _randomList(List input) {
     final data = input.toList();
-    final res = List();
+    final res = [];
     final _random = Random();
     for (var i = 0; i < input.length; i++) {
       final item = data[_random.nextInt(data.length)];

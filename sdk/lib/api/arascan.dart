@@ -47,14 +47,8 @@ class AraScanApi {
   final String moduleRecovery = 'Recovery';
 
   static String getSnEndpoint(String network) {
-    // if (network.contains('polkadot')) {
-    //   network = 'polkadot';
-    // }
-    // if (network.contains('acala')) {
-    //   network = 'acala-testnet';
-    // }
-    // // return 'https://$network.AraScan.io/api/scan';
-    //return 'http://10.0.2.2:8089';
+    // // return 'https://$network.arascan.io/api/scan';
+    // return 'http://10.0.2.2:8089';
     return 'https://scan.nuchain.network/api';
   }
 
@@ -301,6 +295,7 @@ class AraScanApi {
     }
     return {};
   }
+
 
   Future<Map> fetchExtraTokensAsync(String network) async {
     Completer completer = new Completer<Map>();

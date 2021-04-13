@@ -43,30 +43,32 @@ class ApiAssets {
     List<dynamic> tokens = res['token'];
     // final String token = res['token'][0];
 
-    tokens.forEach((token) => {
-          if (token is String)
-            apiRoot.store.assets
-                .setMarketPrices(token, res['detail'][token]['price'])
-          else
-            print('Token is not a string: $token')
-        });
-  }
-
-  Future<void> fetchExtraTokens() async {
-    if (apiRoot.plugin.basic.isTestNet) return;
-
-    final Map res =
-        await apiRoot.araScan.fetchExtraTokensAsync(apiRoot.plugin.basic.name);
-    if (res == null || res['tokens'] == null) {
-      print('fetch market price failed');
-      return;
-    }
-
-    List<String> tokens = res['tokens'];
-
-    tokens.forEach((token) => {
+    tokens.forEach((token){
+    if (token is String){
           apiRoot.store.assets
-              .setMarketPrices(token, res['detail'][token]['price'])
+              .setMarketPrices(token, res['detail'][token]['price']);
+          apiRoot.store.assets
+              .setTokenIds(token, res['detail'][token]['asset_id']);
+              }
         });
   }
+
+//   // @TODO(*): check this
+//   Future<void> fetchExtraTokens() async {
+//     if (apiRoot.plugin.basic.isTestNet) return;
+
+//     final Map res =
+//         await apiRoot.araScan.fetchExtraTokensAsync(apiRoot.plugin.basic.name);
+//     if (res == null || res['tokens'] == null) {
+//       print('fetch market price failed');
+//       return;
+//     }
+
+//     List<dynamic> tokens = res['tokens'];
+
+//     tokens.forEach((token) => {
+//           apiRoot.store.assets
+//               .setMarketPrices(token, res['detail'][token]['price'])
+//         });
+//   }
 }

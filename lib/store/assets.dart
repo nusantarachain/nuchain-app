@@ -34,6 +34,10 @@ abstract class _AssetsStore with Store {
   @observable
   ObservableMap<String, double> marketPrices = ObservableMap<String, double>();
 
+  @observable
+  ObservableMap<String, String> tokenIds = ObservableMap<String, String>();
+
+
   @action
   void setTxsLoading(bool isLoading) {
     isTxsLoading = isLoading;
@@ -78,6 +82,23 @@ abstract class _AssetsStore with Store {
   void setMarketPrices(String token, String price) {
     marketPrices[token] = double.parse(price);
   }
+
+  /// Set extra token pair of Token symbol name -> asset ID.
+  void setTokenIds(String token, String assetId) {
+    tokenIds[token] = assetId;
+  }
+
+  /// Get listed token names
+  List<String> getRegisteredTokens() {
+    return marketPrices.keys.toList();
+  }
+
+
+  /// Get listed token asset IDs.
+  List<String> getRegisteredTokenIds() {
+    return tokenIds.values.toList();
+  }
+
 
   @action
   Future<void> loadAccountCache(KeyPairData acc, String pluginName) async {
