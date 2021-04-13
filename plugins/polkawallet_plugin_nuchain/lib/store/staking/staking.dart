@@ -1,12 +1,9 @@
-import 'dart:developer';
-
 import 'package:mobx/mobx.dart';
-import 'package:polkawallet_sdk/api/types/staking/accountBondedInfo.dart';
-import 'package:polkawallet_sdk/api/types/staking/ownStashInfo.dart';
-import 'package:polkawallet_sdk/api/types/txData.dart';
 import 'package:polkawallet_plugin_nuchain/store/cache/storeCache.dart';
 import 'package:polkawallet_plugin_nuchain/store/staking/types/txData.dart';
 import 'package:polkawallet_plugin_nuchain/store/staking/types/validatorData.dart';
+import 'package:polkawallet_sdk/api/types/staking/accountBondedInfo.dart';
+import 'package:polkawallet_sdk/api/types/staking/ownStashInfo.dart';
 
 part 'staking.g.dart';
 
@@ -48,7 +45,7 @@ abstract class _StakingStore with Store {
   int txsCount = 0;
 
   @observable
-  ObservableList<TxData> txs = ObservableList<TxData>();
+  ObservableList<TxRewardData> txs = ObservableList<TxRewardData>();
 
   @observable
   ObservableList<TxRewardData> txsRewards = ObservableList<TxRewardData>();
@@ -92,7 +89,7 @@ abstract class _StakingStore with Store {
   void setValidatorsInfo(Map data, {bool shouldCache = true}) {
     if (data['validators'] == null) return;
     // log("setValidatorsInfo: $data");
-    if (data['inflation'] == null){
+    if (data['inflation'] == null) {
       return;
     }
     overview = {
@@ -155,11 +152,12 @@ abstract class _StakingStore with Store {
   @action
   Future<void> addTxs(Map data, String pubKey,
       {bool shouldCache = false, reset = false}) async {
-    if (data == null || data['extrinsics'] == null) return;
+    if (data == null || (data['entries'] as Iterable)?.isNotEmpty != true)
+      return;
     txsCount = data['count'];
 
-    List<TxData> ls =
-        List.of(data['extrinsics']).map((i) => TxData.fromJson(i)).toList();
+    List<TxRewardData> ls =
+        List.of(data['entries']).map((i) => TxRewardData.fromJson(i)).toList();
 
     if (reset) {
       txs.clear();
@@ -176,9 +174,10 @@ abstract class _StakingStore with Store {
   @action
   Future<void> addTxsRewards(Map data, String pubKey,
       {bool shouldCache = false}) async {
-    if (data['list'] == null) return;
+    if (data == null || (data['entries'] as Iterable)?.isNotEmpty != true)
+      return;
     List<TxRewardData> ls =
-        List.of(data['list']).map((i) => TxRewardData.fromJson(i)).toList();
+        List.of(data['entries']).map((i) => TxRewardData.fromJson(i)).toList();
 
     txsRewards = ObservableList.of(ls);
 

@@ -36,53 +36,50 @@ class ApiStaking {
   }
 
   Future<Map> updateStakingTxs(int skip) async {
+    if (store.staking.ownStashInfo == null) {
+      return null;
+    }
+
     store.staking.setTxsLoading(true);
 
-    final res = await Future.wait([
-      api.subScan.fetchTxsAsync(
-        'staking',
-        skip: skip,
-        sender: keyring.current.address,
-        network: plugin.basic.name,
-      ),
-      api.subScan.fetchTxsAsync(
-        'utility',
-        call: 'batchAll',
-        skip: skip,
-        sender: keyring.current.address,
-        network: plugin.basic.name,
-      ),
-    ]);
-    final list = res[0];
-    if (res[1] != null && res[1]['extrinsics'] != null) {
-      final batchTxs = List.of(res[1]['extrinsics']);
-      batchTxs.retainWhere((e) => (e['params'] as String).contains('Staking'));
-      final allTxs = [...res[0]['extrinsics'], ...batchTxs];
-      allTxs.sort((a, b) => a['block_num'] < b['block_num'] ? 1 : -1);
-      res[0]['extrinsics'] = allTxs;
+    Map res;
+    try {
+      res = await api.subScan.fetchAccountStakingTxsAsync(
+        stashId: store.staking.ownStashInfo.stashId,
+      );
+    } catch (err) {
+      print('fetchAccountStakingRewardsSlashesTxsAsync error $err');
     }
-    await store.staking.addTxs(
-      list,
-      keyring.current.pubKey,
-      shouldCache: skip == 0,
-      reset: skip == 0,
-    );
+
+    if (res != null) {
+      await store.staking.addTxs(
+        res,
+        keyring.current.pubKey,
+        shouldCache: skip == 0,
+        reset: skip == 0,
+      );
+    }
 
     store.staking.setTxsLoading(false);
 
-    return list;
+    return res;
   }
 
   Future<Map> updateStakingRewards() async {
-    final res = await api.subScan.fetchRewardTxsAsync(
-      skip: 0,
-      sender: keyring.current.address,
-      network: plugin.basic.name,
-    );
-
-    await store.staking
-        .addTxsRewards(res, keyring.current.pubKey, shouldCache: true);
-    return res;
+    if (store.staking.ownStashInfo?.stashId != null) {
+      Map res;
+      try {
+        res = await api.subScan.fetchAccountStakingRewardsSlashesTxsAsync(
+          stashId: store.staking.ownStashInfo.stashId,
+        );
+      } catch (err) {
+        print('fetchAccountStakingRewardsSlashesTxsAsync error $err');
+      }
+      await store.staking
+          .addTxsRewards(res, keyring.current.pubKey, shouldCache: true);
+      return res;
+    }
+    return null;
   }
 
   // this query takes a long time
