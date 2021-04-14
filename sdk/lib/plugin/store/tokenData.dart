@@ -12,7 +12,7 @@ class ExtraTokenDataList extends _ExtraTokenDataList {
       _$ExtraTokenDataListFromJson(json);
   Map<String, dynamic> toJson() => _$ExtraTokenDataListToJson(this);
 
-  int get length => this.extraTokenData.length;
+  int get length => this.extraTokenData != null ? this.extraTokenData.length : 0;
 
   List<ExtraTokenData> get data => this.extraTokenData;
 
@@ -49,7 +49,7 @@ class TokenBalanceData extends _TokenBalanceData {
 abstract class _TokenBalanceData {
   String name;
   String symbol;
-  dynamic amount;
+  String amount;
 
   String detailPageRoute;
 }

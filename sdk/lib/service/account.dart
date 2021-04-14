@@ -28,6 +28,22 @@ class ServiceAccount {
     return res;
   }
 
+  /// query token balance
+  Future<Map> queryTokenBalance(String address, List<int> tokens) async {
+    final code = 'account.getTokensBalance(api, "$address", ${jsonEncode(tokens)})';
+    final res = await serviceRoot.webView
+        .evalJavascript(code);
+    return res;
+  }
+
+  /// query token balance
+  Future<List<dynamic>> getTokenMetadata(List<int> tokenIds) async {
+    final code = 'account.getTokenMetadata(api, ${jsonEncode(tokenIds)})';
+    final res = await serviceRoot.webView
+        .evalJavascript(code);
+    return res;
+  }
+
   /// Get on-chain account info of addresses
   Future<List> queryIndexInfo(List addresses) async {
     var res = await serviceRoot.webView.evalJavascript(

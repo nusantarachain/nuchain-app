@@ -16,3 +16,6 @@ yarn run build
 To test:
 open `./test/index.html` in chrome.
 open chrome dev console and run `runTests().then(console.log)`
+
+For debugging/troubleshooting using Testnet, run `settings.testnetConnect()`,
+after connected successfully you can use regular Substrate JS api.

@@ -10,6 +10,7 @@ import { ApiPromise } from "@polkadot/api";
 import * as jdenticon from "jdenticon";
 
 import { subscribeMessage } from "./setting";
+import { transform } from "@babel/core";
 let keyring = new Keyring({ ss58Format: 0, type: "sr25519" });
 
 /**
@@ -45,162 +46,212 @@ async function genIcons(addresses: string[]) {
  * Get svg icons of pubKeys.
  */
 async function genPubKeyIcons(pubKeys: string[]) {
-  const icons = await genIcons(
-    pubKeys.map((key) => keyring.encodeAddress(hexToU8a(key), 2))
-  );
-  return icons.map((i, index) => {
-    i[0] = pubKeys[index];
-    return i;
-  });
+    const icons = await genIcons(
+        pubKeys.map((key) => keyring.encodeAddress(hexToU8a(key), 2))
+    );
+    return icons.map((i, index) => {
+        i[0] = pubKeys[index];
+        return i;
+    });
 }
 
 /**
  * decode address to it's publicKey
  */
 async function decodeAddress(addresses: string[]) {
-  await cryptoWaitReady();
-  try {
-    const res = {};
-    addresses.forEach((i) => {
-      const pubKey = u8aToHex(keyring.decodeAddress(i));
-      (<any>res)[pubKey] = i;
-    });
-    return res;
-  } catch (err) {
-    (<any>window).send("log", { error: err.message });
-    return null;
-  }
+    await cryptoWaitReady();
+    try {
+        const res = {};
+        addresses.forEach((i) => {
+            const pubKey = u8aToHex(keyring.decodeAddress(i));
+            (<any>res)[pubKey] = i;
+        });
+        return res;
+    } catch (err) {
+        (<any>window).send("log", { error: err.message });
+        return null;
+    }
 }
 
 /**
  * encode pubKey to addresses with different prefixes
  */
 async function encodeAddress(pubKeys: string[], ss58Formats: number[]) {
-  await cryptoWaitReady();
-  const res = {};
-  ss58Formats.forEach((ss58) => {
-    (<any>res)[ss58] = {};
-    pubKeys.forEach((i) => {
-      (<any>res)[ss58][i] = keyring.encodeAddress(hexToU8a(i), ss58);
+    await cryptoWaitReady();
+    const res = {};
+    ss58Formats.forEach((ss58) => {
+        (<any>res)[ss58] = {};
+        pubKeys.forEach((i) => {
+            (<any>res)[ss58][i] = keyring.encodeAddress(hexToU8a(i), ss58);
+        });
     });
-  });
-  return res;
+    return res;
 }
 
 /**
  * query account address with account index
  */
 async function queryAddressWithAccountIndex(
-  api: ApiPromise,
-  accIndex: string,
-  ss58: number
+    api: ApiPromise,
+    accIndex: string,
+    ss58: number
 ) {
-  const num = ss58Decode(accIndex, ss58).toJSON();
-  const res = await api.query.indices.accounts(num.data);
-  return res;
+    const num = ss58Decode(accIndex, ss58).toJSON();
+    const res = await api.query.indices.accounts(num.data);
+    return res;
 }
 
 /**
  * get staking stash/controller relationship of accounts
  */
 async function queryAccountsBonded(api: ApiPromise, pubKeys: string[]) {
-  return Promise.all(
-    pubKeys
-      .map((key) => keyring.encodeAddress(hexToU8a(key), 2))
-      .map((i) =>
-        Promise.all([api.query.staking.bonded(i), api.query.staking.ledger(i)])
-      )
-  ).then((ls) =>
-    ls.map((i, index) => [
-      pubKeys[index],
-      i[0],
-      i[1].toHuman() ? i[1].toHuman()["stash"] : null,
-    ])
-  );
+    return Promise.all(
+        pubKeys
+            .map((key) => keyring.encodeAddress(hexToU8a(key), 2))
+            .map((i) =>
+                Promise.all([api.query.staking.bonded(i), api.query.staking.ledger(i)])
+            )
+    ).then((ls) =>
+        ls.map((i, index) => [
+            pubKeys[index],
+            i[0],
+            i[1].toHuman() ? i[1].toHuman()["stash"] : null,
+        ])
+    );
 }
 
 /**
  * get network native token balance of an address
  */
 async function getBalance(
-  api: ApiPromise,
-  address: string,
-  msgChannel: string
+    api: ApiPromise,
+    address: string,
+    msgChannel: string
 ) {
-  const transfrom = (res: any) => {
-    const lockedBreakdown = res.lockedBreakdown.map((i: any) => {
-      return {
-        ...i,
-        use: hexToString(i.id.toHex()),
-      };
-    });
-    return {
-      ...res,
-      lockedBreakdown,
+    const transfrom = (res: any) => {
+        const lockedBreakdown = res.lockedBreakdown.map((i: any) => {
+            return {
+                ...i,
+                use: hexToString(i.id.toHex()),
+            };
+        });
+        return {
+            ...res,
+            lockedBreakdown,
+        };
     };
-  };
-  if (msgChannel) {
-    subscribeMessage(api.derive.balances.all, [address], msgChannel, transfrom);
-    return;
-  }
+    if (msgChannel) {
+        subscribeMessage(api.derive.balances.all, [address], msgChannel, transfrom);
+        return;
+    }
 
-  const res = await api.derive.balances.all(address);
-  return transfrom(res);
+    const res = await api.derive.balances.all(address);
+    return transfrom(res);
 }
 
 /**
- * get extra tokens
+ * Get token metadata information.
+ * Only for non native token.
+ * 
+ * @param api ApiPromise
+ * @param tokenIds list of token ID in integer
+ * @returns 
+ */
+async function getTokenMetadata(api: ApiPromise, tokenIds: number[]){
+    const transform = (res: any) => {
+        const name = hexToString(res.name.toHex());
+        const symbol = hexToString(res.symbol.toHex());
+        const decimals = res.decimals.toNumber();
+        const deposit = res.deposit.toJSON();
+        return {
+            name,
+            symbol,
+            decimals,
+            deposit
+        }
+    };
+
+    const res = await Promise.all(
+        tokenIds.map(tokenId => api.query.assets.metadata(tokenId))
+    );
+    return res.map(transform);
+}
+
+
+/**
+ * get extra tokens balance
  */
 async function getTokensBalance(
-  api: ApiPromise,
-  address: string,
-  tokens: string[],
-  msgChannel: string
+    api: ApiPromise,
+    address: string,
+    tokenIds: number[],
+    msgChannel: string
 ) {
-  const transfrom = (res: any) => {
-    const lockedBreakdown = res.lockedBreakdown.map((i: any) => {
-      return {
-        ...i,
-        use: hexToString(i.id.toHex()),
-      };
-    });
-    return {
-      ...res,
-      lockedBreakdown,
+    const transfrom = (res: any[]) => {
+        return tokenIds.map((tokenId, index) => {
+            return {
+                ...res[index],
+                balance: res[index].balance.toHuman(),
+                tokenId
+            }
+        } );
     };
-  };
-  if (msgChannel) {
-    // subscribeMessage(api.derive.assets.all, [address], msgChannel, transfrom);
-    return;
-  }
 
-  const res = await Promise.all([
-      api.query.assets.metadata()
-  ]);
+    const subscribeInternal = (method: any, params:[number, string][], msgChannel: string, transfrom: Function) => {
+        return method.multi(params, (res: any) => {
+            const data = transfrom ? transfrom(res) : res;
+            (<any>window).send(msgChannel, data);
+          }).then((unsub: () => void) => {
+            const unsubFuncName = `unsub${msgChannel}`;
+            (<any>window)[unsubFuncName] = unsub;
+            return {};
+          });
+    };
+    
+    if (msgChannel) {
+        // subscribeMessage(api.query.assets.account, [...tokenIds, address], msgChannel, transfrom);
+        // for (let token of tokenIds) {
+        const params:[number, string][] = tokenIds.map((tokenId) => [tokenId, address]);
+        subscribeInternal(api.query.assets.account, 
+            params,
+            msgChannel, transfrom);
+        // }
+        return;
+    }
 
-//   const res = await api.derive.balances.all(address);
-//   const res = await api.query.assets.metadata
-    // console.log(res);
-  return transfrom(res);
+    // const resMeta = await Promise.all(
+    //     tokenIds.map((token_id) =>
+    //         api.query.assets.metadata(token_id)
+    //     )
+    // );
+
+    const res = await Promise.all(
+        tokenIds.map((token_id) =>
+            api.query.assets.account(token_id, address)
+        )
+    );
+
+    return res;
 }
 
 /**
  * get humen info of addresses
  */
 async function getAccountIndex(api: ApiPromise, addresses: string[]) {
-  return api.derive.accounts.indexes().then((res) => {
-    return Promise.all(addresses.map((i) => api.derive.accounts.info(i)));
-  });
+    return api.derive.accounts.indexes().then((res) => {
+        return Promise.all(addresses.map((i) => api.derive.accounts.info(i)));
+    });
 }
 
 export default {
-  encodeAddress,
-  decodeAddress,
-  queryAddressWithAccountIndex,
-  genIcons,
-  genPubKeyIcons,
-  queryAccountsBonded,
-  getBalance,
-  getAccountIndex,
-  getTokensBalance
+    encodeAddress,
+    decodeAddress,
+    queryAddressWithAccountIndex,
+    genIcons,
+    genPubKeyIcons,
+    queryAccountsBonded,
+    getBalance,
+    getAccountIndex,
+    getTokenMetadata,
+    getTokensBalance
 };

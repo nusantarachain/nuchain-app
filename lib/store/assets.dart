@@ -35,7 +35,7 @@ abstract class _AssetsStore with Store {
   ObservableMap<String, double> marketPrices = ObservableMap<String, double>();
 
   @observable
-  ObservableMap<String, String> tokenIds = ObservableMap<String, String>();
+  ObservableMap<String, int> tokenIds = ObservableMap<String, int>();
 
 
   @action
@@ -84,7 +84,7 @@ abstract class _AssetsStore with Store {
   }
 
   /// Set extra token pair of Token symbol name -> asset ID.
-  void setTokenIds(String token, String assetId) {
+  void setTokenIds(String token, int assetId) {
     tokenIds[token] = assetId;
   }
 
@@ -95,7 +95,7 @@ abstract class _AssetsStore with Store {
 
 
   /// Get listed token asset IDs.
-  List<String> getRegisteredTokenIds() {
+  List<int> getRegisteredTokenIds() {
     return tokenIds.values.toList();
   }
 

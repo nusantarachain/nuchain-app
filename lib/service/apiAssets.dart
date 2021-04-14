@@ -43,14 +43,14 @@ class ApiAssets {
     List<dynamic> tokens = res['token'];
     // final String token = res['token'][0];
 
-    tokens.forEach((token){
-    if (token is String){
-          apiRoot.store.assets
-              .setMarketPrices(token, res['detail'][token]['price']);
-          apiRoot.store.assets
-              .setTokenIds(token, res['detail'][token]['asset_id']);
-              }
-        });
+    tokens.forEach((token) {
+      if (token is String) {
+        apiRoot.store.assets
+            .setMarketPrices(token, res['detail'][token]['price']);
+        apiRoot.store.assets
+            .setTokenIds(token, res['detail'][token]['asset_id']);
+      }
+    });
   }
 
 //   // @TODO(*): check this

@@ -70,6 +70,8 @@ class WebViewRunner {
               print('received msg: ${message.message}');
               compute(jsonDecode, message.message).then((msg) {
                 final String path = msg['path'];
+                // print('path: $path');
+                // print('_msgCompleters[path]: ${_msgCompleters[path]}');
                 if (_msgCompleters[path] != null) {
                   Completer handler = _msgCompleters[path];
                   handler.complete(msg['data']);
@@ -77,6 +79,7 @@ class WebViewRunner {
                     _msgCompleters.remove(path);
                   }
                 }
+                // print('_msgHandlers[path]: ${_msgHandlers[path]}');
                 if (_msgHandlers[path] != null) {
                   Function handler = _msgHandlers[path];
                   handler(msg['data']);

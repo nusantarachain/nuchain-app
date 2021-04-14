@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:polkawallet_sdk/api/api.dart';
 import 'package:polkawallet_sdk/api/types/balanceData.dart';
+import 'package:polkawallet_sdk/api/types/tokenMetadata.dart';
 import 'package:polkawallet_sdk/plugin/store/tokenData.dart';
 import 'package:polkawallet_sdk/service/account.dart';
 
@@ -33,6 +34,20 @@ class ApiAccount {
     return res != null ? BalanceData.fromJson(res) : null;
   }
 
+  /// get token metadata information.
+  Future<List<TokenMetadata>> getTokenMetadata(List<int> tokenIds) async {
+    final res = await service.getTokenMetadata(tokenIds);
+    return res != null
+        ? res.map((a) => TokenMetadata.fromJson(a)).toList()
+        : null;
+  }
+
+  // /// query balance
+  // Future<BalanceData> queryTokenBalance(String address, List<int> tokens) async {
+  //   final res = await service.queryTokenBalance(address, tokens);
+  //   return res != null ? BalanceData.fromJson(res) : null;
+  // }
+
   /// subscribe balance
   /// @return [String] msgChannel, call unsubscribeMessage(msgChannel) to unsub.
   Future<String> subscribeBalance(
@@ -52,23 +67,35 @@ class ApiAccount {
     apiRoot.unsubscribeMessage(msgChannel);
   }
 
-  /// subscribe balance
+  /// subscribe token balance
   /// @return [String] msgChannel, call unsubscribeMessage(msgChannel) to unsub.
   Future<String> subscribeTokensBalance(
     String address,
-    List<String> tokens,
-    Function(ExtraTokenDataList) onUpdate,
+    List<int> tokenIds,
+    List<String> tokenNames,
+    Function(List<TokenBalanceData>) onUpdate,
   ) async {
     final msgChannel = 'TokensBalance';
-    final code = 'account.getTokensBalance(api, "$address", ${jsonEncode(tokens)}, "$msgChannel");';
+    final code =
+        'account.getTokensBalance(api, "$address", ${jsonEncode(tokenIds)}, "$msgChannel")';
     print("getting token balance");
-    print(code);
-    await apiRoot.service.webView.subscribeMessage(
-        code, msgChannel, (data) => onUpdate(ExtraTokenDataList.fromJson(data)));
+    // print(code);
+    await apiRoot.service.webView.subscribeMessage(code, msgChannel, (data) {
+      print("RESULT:");
+      print(data);
+      final List<TokenBalanceData> mappedData = data.map((d){
+        Map<String, dynamic> md = {};
+        md["name"] = tokenNames[d["tokenId"] - 1];
+        md["symbol"] = tokenNames[d["tokenId"] - 1];
+        md["amount"] = d["balance"];
+        return TokenBalanceData.fromJson(md);
+      }).where((d) => d.amount != "0").toList().cast<TokenBalanceData>();
+      onUpdate(mappedData);
+    });
     return msgChannel;
   }
 
-  /// unsubscribe balance
+  /// unsubscribe token balance
   void unsubscribeTokensBalance() {
     final msgChannel = 'TokensBalance';
     apiRoot.unsubscribeMessage(msgChannel);

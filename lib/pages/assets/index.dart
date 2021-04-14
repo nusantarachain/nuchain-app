@@ -429,20 +429,19 @@ class _AssetsState extends State<AssetsPage> {
                               .toList(),
                     ),
                     Column(
-                      children: extraTokens == null || extraTokens.length == 0
-                          ? [Container()]
-                          : extraTokens.data.map((ExtraTokenData i) {
-                              return Column(
+                        children: extraTokens == null || extraTokens.length == 0
+                            ? [Container()]
+                            : [Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.only(top: 16),
                                     child: BorderedTitle(
-                                      title: i.title,
+                                      title: "Tokens",
                                     ),
                                   ),
                                   Column(
-                                    children: i.tokens
+                                    children: extraTokens
                                         .map((e) => TokenItem(
                                               e,
                                               decimals,
@@ -454,9 +453,7 @@ class _AssetsState extends State<AssetsPage> {
                                         .toList(),
                                   )
                                 ],
-                              );
-                            }).toList(),
-                    ),
+                              )]),
                   ],
                 ),
               )

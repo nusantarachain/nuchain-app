@@ -224,6 +224,7 @@ class _WalletAppState extends State<WalletApp> {
         _keyring,
         jsCode: WalletApi.getPolkadotJSCode(
             _store.storage, service.plugin.basic.name),
+            extraTokenIds: store.assets.getRegisteredTokenIds()
       );
 
       _startPlugin();

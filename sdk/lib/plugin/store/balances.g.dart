@@ -42,13 +42,13 @@ mixin _$BalancesStore on BalancesStoreBase, Store {
   final _$extraTokensAtom = Atom(name: 'BalancesStoreBase.extraTokens');
 
   @override
-  ExtraTokenDataList get extraTokens {
+  List<TokenBalanceData> get extraTokens {
     _$extraTokensAtom.reportRead();
     return super.extraTokens;
   }
 
   @override
-  set extraTokens(ExtraTokenDataList value) {
+  set extraTokens(List<TokenBalanceData> value) {
     _$extraTokensAtom.reportWrite(value, super.extraTokens, () {
       super.extraTokens = value;
     });
@@ -80,7 +80,7 @@ mixin _$BalancesStore on BalancesStoreBase, Store {
   }
 
   @override
-  void setExtraTokens(ExtraTokenDataList ls) {
+  void setExtraTokens(List<TokenBalanceData> ls) {
     final _$actionInfo = _$BalancesStoreBaseActionController.startAction(
         name: 'BalancesStoreBase.setExtraTokens');
     try {

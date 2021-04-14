@@ -29,6 +29,8 @@ abstract class PolkawalletPlugin implements PolkawalletPluginBase {
 
   final recoveryEnabled = false;
 
+  List<int> extraTokenIds;
+
   /// Plugin should retrieve [networkState] & [networkConst] while start
   NetworkStateData get networkState {
     try {
@@ -73,32 +75,33 @@ abstract class PolkawalletPlugin implements PolkawalletPluginBase {
     );
   }
 
-  void updateExtraTokens(KeyPairData acc, ExtraTokenDataList data) {
-    balances.setExtraTokens(data);
-    _cache.write(_getTokensCacheKey(acc.pubKey), data.toJson());
+  void updateExtraTokens(KeyPairData acc, List<TokenBalanceData> data) {
+    balances.setTokens(data);
+    _cache.write(
+        _getTokensCacheKey(acc.pubKey), data.map((a) => a.toJson()).toList());
   }
 
   void loadExtraTokens(KeyPairData acc) {
+    List<dynamic> data = _cache.read(_getTokensCacheKey(acc.pubKey)) ?? [];
     updateExtraTokens(
       acc,
-      ExtraTokenDataList.fromJson(Map<String, dynamic>.from(
-          _cache.read(_getTokensCacheKey(acc.pubKey)) ?? {})),
+      data
+          .map((d) => TokenBalanceData.fromJson(Map<String, dynamic>.from(d)))
+          .toList(),
     );
   }
 
   /// This method will be called while App switched to a plugin.
   /// In this method, the plugin will init [WalletSDK] and start
   /// a webView for running `polkadot-js/api`.
-  Future<void> beforeStart(
-    Keyring keyring, {
-    WebViewRunner webView,
-    String jsCode,
-  }) async {
+  Future<void> beforeStart(Keyring keyring,
+      {WebViewRunner webView, String jsCode, List<int> extraTokenIds}) async {
     await sdk.init(
       keyring,
       webView: webView,
       jsCode: jsCode ?? (await loadJSCode()),
     );
+    this.extraTokenIds = extraTokenIds;
     await onWillStart(keyring);
   }
 
@@ -121,36 +124,8 @@ abstract class PolkawalletPlugin implements PolkawalletPluginBase {
           (BalanceData data) {
         updateBalances(keyring.current, data);
       });
-      
-      
-      sdk.api.account.subscribeTokensBalance(keyring.current.address, 
-        ["NCO", "MENARA", "MADU"], 
-        (ExtraTokenDataList data){
-          updateExtraTokens(keyring.current, data);
-        });
 
-      // // fill extra tokens
-      // final extraTokens = ExtraTokenDataList.load([
-      //   ExtraTokenData.fromJson({
-      //     "title": "Tokens",
-      //     "tokens": [
-      //       {
-      //         "name": "ENCOIN",
-      //         "symbol": "NCO",
-      //         "amount": "100",
-      //         "detailPageRoute": "/detail"
-      //       },
-      //       {
-      //         "name": "MENARA",
-      //         "symbol": "MBS",
-      //         "amount": "350",
-      //         "detailPageRoute": "/detail"
-      //       }
-      //     ]
-      //   })
-      // ]);
-      // print("ExtraTokens: $extraTokens");
-      // updateExtraTokens(keyring.current, extraTokens);
+      subscribeTokenBalances(keyring.current);
     }
 
     onStarted(keyring);
@@ -158,13 +133,36 @@ abstract class PolkawalletPlugin implements PolkawalletPluginBase {
     return res;
   }
 
+  void subscribeTokenBalances(KeyPairData account) async {
+    loadExtraTokens(account);
+    final resp = await sdk.api.subScan.fetchExtraTokensAsync(this.basic.name);
+    List<String> tokenNames = resp["token"].sublist(1).cast<String>();
+    List<int> tokenIds = tokenNames
+        .map((tokenName) => resp["detail"][tokenName]['asset_id'])
+        .toList()
+        .cast<int>();
+    tokenIds.removeWhere((id) => id == 0);
+    print("tokenNames: $tokenNames");
+    print("tokenIds:");
+    print(tokenIds);
+    sdk.api.account
+        .subscribeTokensBalance(account.address, tokenIds, tokenNames,
+            (List<TokenBalanceData> data) {
+      updateExtraTokens(account, data);
+    });
+  }
+
   /// This method will be called while App user changes account.
   void changeAccount(KeyPairData account) {
     sdk.api.account.unsubscribeBalance();
+    sdk.api.account.unsubscribeTokensBalance();
+
     loadBalances(account);
     sdk.api.account.subscribeBalance(account.address, (BalanceData data) {
       updateBalances(account, data);
     });
+
+    subscribeTokenBalances(account);
 
     onAccountChanged(account);
   }

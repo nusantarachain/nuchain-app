@@ -14,7 +14,7 @@ abstract class BalancesStoreBase with Store {
   List<TokenBalanceData> tokens;
 
   @observable
-  ExtraTokenDataList extraTokens;
+  List<TokenBalanceData> extraTokens;
 
   @action
   void setBalance(BalanceData data) {
@@ -27,7 +27,7 @@ abstract class BalancesStoreBase with Store {
   }
 
   @action
-  void setExtraTokens(ExtraTokenDataList ls) {
+  void setExtraTokens(List<TokenBalanceData> ls) {
     extraTokens = ls;
   }
 }

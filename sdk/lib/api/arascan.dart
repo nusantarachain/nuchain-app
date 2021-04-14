@@ -315,7 +315,7 @@ class AraScanApi {
   }
 
   static Future<Map> fetchExtraTokens(AraScanRequestParams para) async {
-    String url = '${getSnEndpoint(para.network)}/registered_tokens';
+    String url = '${getSnEndpoint(para.network)}/token';
     Map<String, String> headers = {"Content-type": "application/json"};
 
     Response res = await get(url, headers: headers);

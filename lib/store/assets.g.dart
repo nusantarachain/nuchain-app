@@ -99,6 +99,21 @@ mixin _$AssetsStore on _AssetsStore, Store {
     });
   }
 
+  final _$tokenIdsAtom = Atom(name: '_AssetsStore.tokenIds');
+
+  @override
+  ObservableMap<String, int> get tokenIds {
+    _$tokenIdsAtom.reportRead();
+    return super.tokenIds;
+  }
+
+  @override
+  set tokenIds(ObservableMap<String, int> value) {
+    _$tokenIdsAtom.reportWrite(value, super.tokenIds, () {
+      super.tokenIds = value;
+    });
+  }
+
   final _$clearTxsAsyncAction = AsyncAction('_AssetsStore.clearTxs');
 
   @override
@@ -175,7 +190,8 @@ isTxsLoading: ${isTxsLoading},
 submitting: ${submitting},
 txsCount: ${txsCount},
 txs: ${txs},
-marketPrices: ${marketPrices}
+marketPrices: ${marketPrices},
+tokenIds: ${tokenIds}
     ''';
   }
 }
