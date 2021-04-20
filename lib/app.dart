@@ -317,7 +317,7 @@ class _WalletAppState extends State<WalletApp> {
   @override
   Widget build(_) {
     return MaterialApp(
-      title: 'Nuchain Vault',
+      title: 'Nuchain App',
       theme: _theme ?? _getAppTheme(widget.plugins[0].basic.primaryColor),
       debugShowCheckedModeBanner: false,
       localizationsDelegates: [

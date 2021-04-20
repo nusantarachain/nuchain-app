@@ -1,4 +1,4 @@
-# Nuchain Vault App
+# Nuchain App
 
 This is Nuchain App built with Flutter, based on Polkawallet.
 
@@ -25,3 +25,10 @@ For delete existing conflicting output:
 $ ./etc/script/gen_code.sh --delete-conflicting-outputs
 ```
 
+# Build
+
+For build apk:
+
+```
+$ flutter build apk --flavor prod lib/main.dart
+```

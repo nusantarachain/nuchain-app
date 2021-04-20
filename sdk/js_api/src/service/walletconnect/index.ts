@@ -77,8 +77,8 @@ async function disconnect(param: SessionTypes.DeleteParams) {
 async function approveProposal(proposal: SessionTypes.Proposal, address: string) {
   const response: SessionTypes.Response = {
     metadata: {
-      name: "Nuchain Vault",
-      description: "Nuchain Vault App.",
+      name: "Nuchain App",
+      description: "Nuchain App",
       url: "#",
       icons: ["https://nuchain.id/images/logo.png"],
     },
