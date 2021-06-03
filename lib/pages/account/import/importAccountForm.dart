@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:polkawallet_sdk/api/apiKeyring.dart';
+import 'package:polkawallet_sdk/storage/keyring.dart';
 import 'package:polkawallet_sdk/utils/i18n.dart';
 import 'package:polkawallet_ui/components/roundedButton.dart';
 import 'package:polkawallet_ui/pages/scanPage.dart';
@@ -30,7 +31,8 @@ class _ImportAccountFormState extends State<ImportAccountForm> {
     'mnemonic',
     'rawSeed',
     'keystore',
-    'observe',
+    // 'observe',
+    'secretQr',
   ];
 
   bool _supportBiometric = false;
@@ -44,12 +46,15 @@ class _ImportAccountFormState extends State<ImportAccountForm> {
   final TextEditingController _keyCtrl = new TextEditingController();
   final TextEditingController _nameCtrl = new TextEditingController();
   final TextEditingController _passCtrl = new TextEditingController();
+  final TextEditingController _passConfirmCtrl = new TextEditingController();
 
-  final TextEditingController _observationAddressCtrl =
+  // final TextEditingController _observationAddressCtrl =
+  //     new TextEditingController();
+  final TextEditingController _addressCtl =
       new TextEditingController();
-  final TextEditingController _observationNameCtrl =
-      new TextEditingController();
-  final TextEditingController _memoCtrl = new TextEditingController();
+  // final TextEditingController _observationNameCtrl =
+  //     new TextEditingController();
+  // final TextEditingController _memoCtrl = new TextEditingController();
 
   String _keyCtrlText = '';
   AccountAdvanceOptionParams _advanceOptions = AccountAdvanceOptionParams();
@@ -168,16 +173,40 @@ class _ImportAccountFormState extends State<ImportAccountForm> {
                 onTap: () async {
                   final acc = (await Navigator.of(context)
                       .pushNamed(ScanPage.route)) as QRCodeResult;
+                  // final acc = "secret:0xabcdefxxxxx";
+                  // final acc = QRCodeResult(
+                  //   type: QRCodeResultType.secretKeyHex,
+                  //   hex:
+                  //       "0xabcdefxxxxx",
+                  // );
+                  print("acc: $acc");
                   if (acc != null) {
+                    if (acc.type == QRCodeResultType.secretKeyHex) {
+                      // map address from secret hex key
+                      Keyring keyring;
+                      final accLookup = await widget.service.plugin.sdk.api.keyring
+                          .importAccount(keyring,
+                              keyType: KeyType.rawSeed,
+                              key: acc.hex,
+                              cryptoType: CryptoType.sr25519,
+                              name: "",
+                              password: "");
+                      print("accLookup: $accLookup");
+                      setState((){
+                        _addressCtl.text = accLookup['address'].trim();
+                        _keyCtrl.text = acc.hex.trim();
+                      });
+                      return;
+                    }
                     setState(() {
-                      _observationAddressCtrl.text = acc.address.address;
-                      _observationNameCtrl.text = acc.address.name;
+                      // _addressCtl.text = acc.address.address;
+                      _nameCtrl.text = acc.address.name;
                     });
                   }
                 },
               ),
             ),
-            controller: _observationAddressCtrl,
+            controller: _addressCtl,
             validator: (v) {
               if (!Fmt.isAddress(v.trim())) {
                 return dic['contact.address.error'];
@@ -193,9 +222,46 @@ class _ImportAccountFormState extends State<ImportAccountForm> {
               hintText: dic['contact.name'],
               labelText: dic['contact.name'],
             ),
-            controller: _observationNameCtrl,
+            controller: _nameCtrl,
             validator: (v) {
               return v.trim().length > 0 ? null : dic['contact.name.error'];
+            },
+          ),
+        ),
+        // Padding(
+        //   padding: EdgeInsets.only(left: 16, right: 16),
+        //   child: TextFormField(
+        //     decoration: InputDecoration(
+        //       hintText: dic['contact.memo'],
+        //       labelText: dic['contact.memo'],
+        //     ),
+        //     controller: _memoCtrl,
+        //   ),
+        // ),
+        Padding(
+          padding: EdgeInsets.only(left: 16, right: 16),
+          child: TextFormField(
+            decoration: InputDecoration(
+              hintText: dic['password'],
+              labelText: dic['password'],
+              suffixIcon: IconButton(
+                iconSize: 18,
+                icon: Icon(
+                  CupertinoIcons.clear_thick_circled,
+                  color: Theme.of(context).unselectedWidgetColor,
+                ),
+                onPressed: () {
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _passCtrl.clear());
+                },
+              ),
+            ),
+            controller: _passCtrl,
+            obscureText: true,
+            validator: (v) {
+              // TODO: fix me: disable validator for polkawallet-RN exported keystore importing
+              return null;
+              return v.trim().length > 0 ? null : dic['create.password.error'];
             },
           ),
         ),
@@ -203,81 +269,96 @@ class _ImportAccountFormState extends State<ImportAccountForm> {
           padding: EdgeInsets.only(left: 16, right: 16),
           child: TextFormField(
             decoration: InputDecoration(
-              hintText: dic['contact.memo'],
-              labelText: dic['contact.memo'],
+              hintText: dic['password2'],
+              labelText: dic['password2'],
+              suffixIcon: IconButton(
+                iconSize: 18,
+                icon: Icon(
+                  CupertinoIcons.clear_thick_circled,
+                  color: Theme.of(context).unselectedWidgetColor,
+                ),
+                onPressed: () {
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _passConfirmCtrl.clear());
+                },
+              ),
             ),
-            controller: _memoCtrl,
+            controller: _passConfirmCtrl,
+            obscureText: true,
+            validator: (v) {
+              return v.trim().length > 0 && v.trim() == _passCtrl.text.trim() ? null : dic['password2.error'];
+            },
           ),
         ),
       ],
     );
   }
 
-  Future<void> _onAddObservationAccount() async {
-    setState(() {
-      _observationSubmitting = true;
-    });
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Container(),
-          content: Container(height: 64, child: CupertinoActivityIndicator()),
-        );
-      },
-    );
+  // Future<void> _onAddObservationAccount() async {
+  //   setState(() {
+  //     _observationSubmitting = true;
+  //   });
+  //   showCupertinoDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return CupertinoAlertDialog(
+  //         title: Container(),
+  //         content: Container(height: 64, child: CupertinoActivityIndicator()),
+  //       );
+  //     },
+  //   );
 
-    final dic = I18n.of(context).getDic(i18n_full_dic_app, 'profile');
-    final address = _observationAddressCtrl.text.trim();
-    final pubKeyAddress =
-        await widget.service.plugin.sdk.api.account.decodeAddress([address]);
-    final pubKey = pubKeyAddress.keys.toList()[0];
-    Map<String, dynamic> acc = {
-      'address': address,
-      'name': _observationNameCtrl.text,
-      'memo': _memoCtrl.text,
-      'observation': true,
-      'pubKey': pubKey,
-    };
-    // create new contact
-    int exist = widget.service.keyring.externals
-        .indexWhere((i) => i.address == address);
-    if (exist > -1) {
-      setState(() {
-        _observationSubmitting = false;
-      });
-      Navigator.of(context).pop();
+  //   final dic = I18n.of(context).getDic(i18n_full_dic_app, 'profile');
+  //   final address = _addressCtl.text.trim();
+  //   final pubKeyAddress =
+  //       await widget.service.plugin.sdk.api.account.decodeAddress([address]);
+  //   final pubKey = pubKeyAddress.keys.toList()[0];
+  //   Map<String, dynamic> acc = {
+  //     'address': address,
+  //     'name': _observationNameCtrl.text,
+  //     'memo': _memoCtrl.text,
+  //     'observation': true,
+  //     'pubKey': pubKey,
+  //   };
+  //   // create new contact
+  //   int exist = widget.service.keyring.externals
+  //       .indexWhere((i) => i.address == address);
+  //   if (exist > -1) {
+  //     setState(() {
+  //       _observationSubmitting = false;
+  //     });
+  //     Navigator.of(context).pop();
 
-      showCupertinoDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: Container(),
-            content: Text(dic['contact.exist']),
-            actions: <Widget>[
-              CupertinoButton(
-                child: Text(
-                    I18n.of(context).getDic(i18n_full_dic_ui, 'common')['ok']),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      final res = await widget.service.plugin.sdk.api.keyring
-          .addContact(widget.service.keyring, acc);
-      widget.service.plugin.changeAccount(res);
-      widget.service.store.assets
-          .loadCache(res, widget.service.plugin.basic.name);
+  //     showCupertinoDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return CupertinoAlertDialog(
+  //           title: Container(),
+  //           content: Text(dic['contact.exist']),
+  //           actions: <Widget>[
+  //             CupertinoButton(
+  //               child: Text(
+  //                   I18n.of(context).getDic(i18n_full_dic_ui, 'common')['ok']),
+  //               onPressed: () => Navigator.of(context).pop(),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     );
+  //   } else {
+  //     final res = await widget.service.plugin.sdk.api.keyring
+  //         .addContact(widget.service.keyring, acc);
+  //     widget.service.plugin.changeAccount(res);
+  //     widget.service.store.assets
+  //         .loadCache(res, widget.service.plugin.basic.name);
 
-      setState(() {
-        _observationSubmitting = false;
-      });
-      // go to home page
-      Navigator.popUntil(context, ModalRoute.withName('/'));
-    }
-  }
+  //     setState(() {
+  //       _observationSubmitting = false;
+  //     });
+  //     // go to home page
+  //     Navigator.popUntil(context, ModalRoute.withName('/'));
+  //   }
+  // }
 
   String _validateInput(String v) {
     bool passed = false;
@@ -334,9 +415,9 @@ class _ImportAccountFormState extends State<ImportAccountForm> {
     _nameCtrl.dispose();
     _passCtrl.dispose();
     _keyCtrl.dispose();
-    _observationAddressCtrl.dispose();
-    _observationNameCtrl.dispose();
-    _memoCtrl.dispose();
+    _addressCtl.dispose();
+    // _observationNameCtrl.dispose();
+    // _memoCtrl.dispose();
     super.dispose();
   }
 
@@ -424,22 +505,26 @@ class _ImportAccountFormState extends State<ImportAccountForm> {
                 : () async {
                     if (_formKey.currentState.validate() &&
                         !(_advanceOptions.error ?? false)) {
-                      if (_keySelection == 3) {
-                        _onAddObservationAccount();
-                        return;
-                      }
-                      if (_keySelection == 2) {
+                      // if (_keySelection == 3) {
+                      //   _onAddObservationAccount();
+                      //   return;
+                      // }
+                      if (_keySelection == 2 || _keySelection == 3) {
+                        if (_passCtrl.text.trim() != _passConfirmCtrl.text.trim()){
+                          return;
+                        }
                         widget.service.store.account.setNewAccount(
                             _nameCtrl.text.trim(), _passCtrl.text.trim());
                       }
+                      final keyType = _keySelection != 3 ? _keyOptions[_keySelection] : "rawSeed";
                       widget.service.store.account
                           .setNewAccountKey(_keyCtrl.text.trim());
                       final saved = await widget.onSubmit({
-                        'keyType': _keyOptions[_keySelection],
+                        'keyType': keyType,
                         'cryptoType':
                             _advanceOptions.type ?? CryptoType.sr25519,
                         'derivePath': _advanceOptions.path ?? '',
-                        'finish': _keySelection == 2 ? true : null,
+                        'finish': _keySelection == 2 || _keySelection == 3,
                       });
                       if (saved) {
                         if (_supportBiometric && _enableBiometric) {

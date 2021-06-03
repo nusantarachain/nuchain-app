@@ -54,6 +54,10 @@ class _StakingActions extends State<StakingActions>
   ScrollController _scrollController;
 
   Future<void> _updateStakingTxs() async {
+    if (widget.plugin.service == null){
+      print("widget.plugin.service is null (look like not loaded yet)");
+      return;
+    }
     setState(() {
       _loading = true;
     });
@@ -74,6 +78,10 @@ class _StakingActions extends State<StakingActions>
   }
 
   Future<void> _updateStakingRewardTxs() async {
+    if (widget.plugin.service == null){
+      print("widget.plugin.service is null (look like not loaded yet)");
+      return;
+    }
     setState(() {
       _rewardLoading = true;
     });
@@ -86,6 +94,10 @@ class _StakingActions extends State<StakingActions>
   }
 
   Future<void> _updateStakingInfo() async {
+    if (widget.plugin.service == null){
+      print("widget.plugin.service is null (look like not loaded yet)");
+      return;
+    }
     _tab == 0 ? _updateStakingTxs() : _updateStakingRewardTxs();
 
     await widget.plugin.service.staking.queryOwnStashInfo();
@@ -98,7 +110,7 @@ class _StakingActions extends State<StakingActions>
   }
 
   List<Widget> _buildTxList() {
-    final dic = I18n.of(context).getDic(i18n_full_dic_nuchain, 'common');
+    // final dic = I18n.of(context).getDic(i18n_full_dic_nuchain, 'common');
     final int decimals = widget.plugin.networkState.tokenDecimals[0];
     final String symbol = widget.plugin.networkState.tokenSymbol[0];
 

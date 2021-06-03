@@ -48,6 +48,14 @@ class ScanPage extends StatelessWidget {
           return;
         }
 
+        if (ls[0] == 'secret' && ls.length >= 2) {
+          Navigator.of(context).pop(QRCodeResult(
+            type: QRCodeResultType.secretKeyHex,
+            hex: ls[1],
+          ));
+          return;
+        }
+
         for (String item in ls) {
           if (Fmt.isAddress(item)) {
             address = item;
@@ -98,6 +106,7 @@ class ScanPage extends StatelessWidget {
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ),
+                helpWidget: Text("Scanning for QR code"),
                 onScan: onScan);
           } else {
             return Container();
@@ -108,7 +117,7 @@ class ScanPage extends StatelessWidget {
   }
 }
 
-enum QRCodeResultType { address, hex, rawData }
+enum QRCodeResultType { address, hex, rawData, secretKeyHex }
 
 class QRCodeResult {
   QRCodeResult({this.type, this.address, this.hex, this.rawData});
@@ -117,6 +126,15 @@ class QRCodeResult {
   final QRCodeAddressResult address;
   final String hex;
   final String rawData;
+
+  // QRCodeResult copy({address:}) {
+  //   return new QRCodeResult(
+  //     type: this.type,
+  //     address: this.address==null ? address,
+  //     hex: this.hex,
+  //     rawData: this.rawData
+  //   );
+  // }
 }
 
 class QRCodeAddressResult {

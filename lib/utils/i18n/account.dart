@@ -45,6 +45,7 @@ const Map<String, String> enAccount = {
       '\nA recoverable account can\nsend Tx through a proxy account\n',
   'observe.proxy.invalid': 'Invalid proxy account',
   'observe.invalid': 'Invalid',
+  'secretQr': 'QR Code',
   'list': 'Account Select',
   'unlock': 'Unlock Account with Password',
   'unlock.bio': 'Authenticate to unlock',

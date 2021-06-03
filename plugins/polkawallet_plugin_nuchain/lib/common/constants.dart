@@ -9,6 +9,11 @@ const node_list_nuchain = [
     'ss58': 42,
     'endpoint': 'wss://node-sg.nuchain.riset.tech',
   },
+  {
+    'name': 'Nuchain (hosted by Enco Indonesia)',
+    'ss58': 42,
+    'endpoint': 'wss://id01.nuchain.live',
+  },
   // hanya untuk testing/development
   // comment out endpoint testnet ini ketika build untuk production
   {

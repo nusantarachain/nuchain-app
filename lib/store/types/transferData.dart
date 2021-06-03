@@ -7,7 +7,7 @@ TransferData _$TransferDataFromJson(Map<String, dynamic> json) {
   return TransferData()
     ..blockNum = json['block'] as int
     ..blockTimestamp = json['ts'] as int
-    ..extrinsicIndex = json['extrinsic_index'] as String
+    ..extrinsicIndex = json['extrinsic_index'].toString()
     ..fee = "-"
     ..from = json['src'] as String
     ..to = json['dst'] as String

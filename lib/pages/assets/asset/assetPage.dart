@@ -126,7 +126,7 @@ class _AssetPageState extends State<AssetPage>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(I18n.of(context)
-                    .getDic(i18n_full_dic_app, 'assets')['address.subscan']),
+                    .getDic(i18n_full_dic_app, 'assets')['address.arascan']),
                 Padding(
                   padding: EdgeInsets.only(left: 8),
                   child: Icon(

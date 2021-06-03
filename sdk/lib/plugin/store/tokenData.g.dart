@@ -41,7 +41,7 @@ TokenBalanceData _$TokenBalanceDataFromJson(Map<String, dynamic> json) {
   return TokenBalanceData()
     ..name = json['name'] as String
     ..symbol = json['symbol'] as String
-    ..amount = json['amount']
+    ..amount = json['amount'] as String
     ..detailPageRoute = json['detailPageRoute'] as String;
 }
 

@@ -136,6 +136,9 @@ abstract class PolkawalletPlugin implements PolkawalletPluginBase {
   void subscribeTokenBalances(KeyPairData account) async {
     loadExtraTokens(account);
     final resp = await sdk.api.subScan.fetchExtraTokensAsync(this.basic.name);
+    if (resp["token"] == null){
+      return;
+    }
     List<String> tokenNames = resp["token"].sublist(1).cast<String>();
     List<int> tokenIds = tokenNames
         .map((tokenName) => resp["detail"][tokenName]['asset_id'])
