@@ -30,6 +30,7 @@
     "@polkadot/api": "^3.7.3",
     "@polkadot/ui-shared": "0.68.1",
     "@walletconnect/client": "2.0.0-alpha.26",
+    "nuchain-js-api": "git+https://github.com/nusantarachain/nuchain-js-api.git",
     "bn.js": "^5.1.2",
     "oo7-substrate": "^0.8.0",
     "secp256k1": "^3.8.0",

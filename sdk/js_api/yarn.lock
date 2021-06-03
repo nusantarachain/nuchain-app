@@ -1134,7 +1134,7 @@
     "@polkadot/x-rxjs" "^5.5.2"
     bn.js "^4.11.9"
 
-"@polkadot/api@3.7.3", "@polkadot/api@^3.7.3":
+"@polkadot/api@3.7.3", "@polkadot/api@^3.7.3", "@polkadot/api@^4.12.1":
   version "3.7.3"
   resolved "https://registry.yarnpkg.com/@polkadot/api/-/api-3.7.3.tgz#14a016f8343286923d8fbdf4e892ea83dd1e35d4"
   integrity sha512-zHiI/8WiCSnyctUQDER5/hj6GLvknQNxjlh61ecoYkGE5S5Ofs7ph/6R66S6wJZEGLHOqtvzCvcxN3z94ZSHSA==
@@ -6970,6 +6970,12 @@ npmlog@^4.0.1:
     console-control-strings "~1.1.0"
     gauge "~2.7.3"
     set-blocking "~2.0.0"
+
+"nuchain-js-api@git+https://github.com/nusantarachain/nuchain-js-api.git":
+  version "0.1.0"
+  resolved "git+https://github.com/nusantarachain/nuchain-js-api.git#caa8e797eff66f42d770ec8a4886ed4b89faa868"
+  dependencies:
+    "@polkadot/api" "^4.12.1"
 
 number-is-nan@^1.0.0:
   version "1.0.1"
